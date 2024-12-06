@@ -1,6 +1,10 @@
-# Wasserstadt Spindlersfeld
+# Wasserstadt Spindlersfeld Information Sharing
 
 ![Building](locations/resources/building.jpg)
+
+Deployed webpage: https://wasserstadtspindlersfeld.github.io/information_sharing
+
+## Welcome
 
 Hello everyone,
 

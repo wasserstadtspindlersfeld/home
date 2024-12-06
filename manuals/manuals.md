@@ -4,5 +4,5 @@ This document collects the user manuals for the standard equipment in the apartm
 
 ## Washing machine Zanussi ZDLN5521
 
-[Manual](./zdln5521.pdf)
+[Zanussi ZDLN5521 user manual](./zdln5521.pdf)
 

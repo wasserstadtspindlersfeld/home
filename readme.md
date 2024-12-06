@@ -1,5 +1,7 @@
 # Wasserstadt Spindlersfeld
 
+![Building](locations/resources/building.jpg)
+
 Hello everyone,
 
 This is a place where some generic information can be collected for the residents of Wasserstadt Spindlersfeld.

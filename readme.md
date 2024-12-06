@@ -19,4 +19,10 @@ Additional information
 
 ## Contribution
 
-If you know how GitHub works, feel free to create a merge request. If you do not know, send the information that you would like to have added to the [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com) address and I will do my best to add it here.
+Contributions/ideas/recommendations are very welcome. Do not hesitate to reach out if you have an idea how and what to improve.
+
+The following options are available for contribution at the moment:
+- Option 0: Send a message to the WhatsApp group
+- Option 1: Write an email to [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com) address and I will do my best to add it here.
+- Option 2: create an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
+- Option 3: create a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)

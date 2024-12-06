@@ -25,4 +25,4 @@ Opening hours: Mo-Fr 9-12 Uhr
 
 ### Official website
 
-Link: https://hausverwaltung-bock.com
+Link: [https://hausverwaltung-bock.com](https://hausverwaltung-bock.com)

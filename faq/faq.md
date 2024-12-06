@@ -27,7 +27,7 @@ You can also add the dates to the calendar on your phone by clicking on the `.ic
 
 ## How does the heating system work?
 
-The heating system is using warm water, which is propageted to the floor heating pipes and also to the wall radiators. The controller is responsible to open/close the warm water valves at a certain temperature.
+The heating system is using warm water, which is propagated to the floor heating pipes and also to the wall radiators. The controller is responsible to open/close the warm water valves at a certain temperature.
 
 Good to know:
 - The heating system is slow, if you change the controller settings it will take a while (could be day) to see the impact
@@ -38,3 +38,7 @@ Good to know:
 Here is a video tutorial created by one of the WhatsApp group members.
 
 <video src="./resources/heating_tutorial.mp4" width="320" height="240" controls></video>
+
+## My question is not answered here, what should I do?
+
+Ask your question in the WhatsApp group, and if it will be something that can be useful for everyone, it will be added to this section.

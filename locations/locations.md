@@ -13,7 +13,7 @@ For the complete list, check the official documentation in the link.
 
 Address: [Oberspreestraße 109, 12555 Berlin (Treptow-Köpenick)](https://maps.app.goo.gl/WCnPVRG7KgMqrHJp8)
 
-Link: https://www.bsr.de/recyclinghoefe-20503.php
+Link: [https://www.bsr.de/recyclinghoefe-20503.php](https://www.bsr.de/recyclinghoefe-20503.php)
 
 ### Used but not damaged clothes/shoes
 

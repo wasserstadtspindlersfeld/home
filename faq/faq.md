@@ -35,6 +35,6 @@ Good to know:
 - Level 3 on the controller means ~22° Celsius
 - If you have problems with the heating system, contact [Bock Hausverwaltung](../contacts/contacts.md#bock-hausverwaltung)
 
-Here is a video tutorial created by Madiyar:
+Here is a video tutorial created by one of the WhatsApp group members.
 
 <video src="./resources/heating_tutorial.mp4" width="320" height="240" controls></video>

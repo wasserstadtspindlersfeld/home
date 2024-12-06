@@ -6,7 +6,7 @@
 
 Hello everyone,
 
-This is a place where some generic information can be collected for the residents of Wasserstadt Spindlersfeld.
+This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
 Table of content
 - [Frequently Asked Questions](./faq/faq.md)

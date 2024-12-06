@@ -24,3 +24,17 @@ You can also add the dates to the calendar on your phone by clicking on the `.ic
 | | |
 |-|-|
 | Abfuhrkalender 2024 | [Abfuhrkalender_2024.ics](./resources/Abfuhrkalender_2024.ics) |
+
+## How does the heating system work?
+
+The heating system is based on warm water, which is used in the floor heating and also on the wall radiators. The controller is responsible to open/close the warm water valves.
+
+Good to know:
+- The heating system is slow, if you change the settings it will take a while (could be day) to see the impact
+- If you want to save money, set it to a comfortable level and do not change it regularly, only if you leave the apartment for a longer period
+- Level 3 on the controller means ~22° Celsius
+- If you have problems with the heating system, contact [Bock Hausverwaltung](../contacts/contacts.md#bock-hausverwaltung)
+
+Here is a video tutorial created by Madiyar:
+
+<video src="./resources/heating_tutorial.mp4" width="320" height="240" controls></video>

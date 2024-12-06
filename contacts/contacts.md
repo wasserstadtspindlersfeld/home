@@ -2,13 +2,17 @@
 
 ## Bock Hausverwaltung
 
-Contact in case of:
+General Hausverwaltung company, that is responsible for most of the apartments in the building.
+
+Typical topics:
 - Problems with keys (lost, stolen)
 - Painting
 - Mounting lights
-- any other Hausverwaltung topic
+- any other Hausverwaltung related topic
 
 ### General contact
+
+> Use this contact first.
 
 | | |
 |-|-|
@@ -18,6 +22,8 @@ Contact in case of:
 | Website | [https://hausverwaltung-bock.com](https://hausverwaltung-bock.com) |
 
 ### Direct contact
+
+> Please use the direct contact only if the general one does not work.
 
 | | |
 |-|-|
@@ -29,6 +35,11 @@ Contact in case of:
 
 Regarding Hausverwaltung topics, you can try to contact them first - but it's worth to check their website and see which company is assigned to which address. Most of the addresses are assigned to Bock Hausverwaltung - in that case, it is better to contact them directly.
 
+Topics:
+- Underground garage
+- Storage room
+- General apartment renting questions
+
 | | |
 |-|-|
 | Address  | Mühlenstraße 35, 10243 Berlin |
@@ -37,7 +48,10 @@ Regarding Hausverwaltung topics, you can try to contact them first - but it's wo
 
 ## ROMI Immobilien GmbH
 
-Apartment renting agency.
+Apartment renting agency, they are responsible to find new tenants for the building.
+
+Topics:
+- Getting a new apartment
 
 | | |
 |-|-|

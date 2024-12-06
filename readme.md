@@ -2,8 +2,6 @@
 
 ![Building](locations/resources/building.jpg)
 
-Deployed webpage: https://wasserstadtspindlersfeld.github.io/information_sharing
-
 ## Welcome
 
 Hello everyone,
@@ -12,6 +10,7 @@ This is a place where some generic information can be collected for the resident
 
 Table of content
 - [Frequntly Asked Questions](./faq/faq.md)
+- [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)
 - [User manuals](./manuals/manuals.md)
 

@@ -1,4 +1,4 @@
-# Wasserstadt Spindlersfeld Information Sharing
+# Wasserstadt Spindlersfeld
 
 ![Building](locations/resources/building.jpg)
 

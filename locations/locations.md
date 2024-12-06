@@ -15,7 +15,7 @@ Address: [Oberspreestraße 109, 12555 Berlin (Treptow-Köpenick)](https://maps.a
 
 Link: https://www.bsr.de/recyclinghoefe-20503.php
 
-### Used but not damaged cloths/shoes
+### Used but not damaged clothes/shoes
 
 Instead of throwing away the clothes and shoes that you do not want to use anymore, you can take them to the neareast collection point.
 

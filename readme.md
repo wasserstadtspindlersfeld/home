@@ -9,7 +9,7 @@ Hello everyone,
 This is a place where some generic information can be collected for the residents of Wasserstadt Spindlersfeld.
 
 Table of content
-- [Frequntly Asked Questions](./faq/faq.md)
+- [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)
 - [User manuals](./manuals/manuals.md)

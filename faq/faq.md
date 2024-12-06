@@ -1,5 +1,13 @@
 # Frequently asked/answered questions
 
+## I have to paint the wall, what should I do?
+
+The walls are painted with the `Brillux Ecofinish 947` paint. Unfortunately the smallest available package is 15 liters. If you need to get your apartment painted or apply some small fixes, it is suggested to ask in the WhatsApp group first, maybe you can team up with other people and save costs.
+
+<img src="resources/ecofinish_947_paint.png" alt="ecofinish" width="500"/>
+
+Check out the cheapest options on [www.idealo.de](https://www.idealo.de/preisvergleich/ProductCategory/9792.html?q=brillux%20947).
+
 ## On which days is the garbage collected?
 
 The different kinds of garbage are collected on different days of the week. For the up to date schedule, check the attached `.pdf` files.
@@ -32,15 +40,6 @@ Good to know:
 Here is a video tutorial created by one of the WhatsApp group members.
 
 <video src="./resources/heating_tutorial.mp4" width="500" controls></video>
-
-## I have to paint the wall, what should I do?
-
-The walls are painted with the `Brillux Ecofinish 947` paint. Unfortunately the smallest available package is 15 liters. If you need to get your apartment painted or apply some small fixes, it is suggested to ask in the WhatsApp group first, maybe you can team up with other people and save costs.
-
-<img src="resources/ecofinish_947_paint.png" alt="ecofinish" width="500"/>
-
-Check out the cheapest options on [www.idealo.de](https://www.idealo.de/preisvergleich/ProductCategory/9792.html?q=brillux%20947).
-
 
 
 ## My question is not answered here, what should I do?

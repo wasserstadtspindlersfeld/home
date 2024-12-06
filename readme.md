@@ -14,6 +14,9 @@ Table of content
 - [Locations nearby](./locations/locations.md)
 - [User manuals](./manuals/manuals.md)
 
+Additional information
+- [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)
+
 ## Contribution
 
 If you know how GitHub works, feel free to create a merge request. If you do not know, send the information that you would like to have added to the [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com) address and I will do my best to add it here.

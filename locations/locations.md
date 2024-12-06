@@ -1,6 +1,6 @@
 # Locations
 
-## Garbage and recycling
+## Garbage collection and recycling
 
 ### Recyclinghof Oberspreestraße
 

@@ -44,4 +44,4 @@ Here is a video tutorial created by one of the WhatsApp group members.
 
 ## My question is not answered here, what should I do?
 
-Ask your question in the WhatsApp group, and if it will be something that can be useful for everyone, it will be added to this section.
+Ask your question in the WhatsApp group, get a coffee and wait for the answer.

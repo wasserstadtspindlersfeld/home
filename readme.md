@@ -21,8 +21,8 @@ Additional information
 
 Contributions/ideas/recommendations are very welcome. Do not hesitate to reach out if you have an idea how and what to improve.
 
-The following options are available for contribution at the moment:
-- Send a message to the WhatsApp group
-- Write an email to [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com) address and I will do my best to add it here.
-- Create an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
-- Create a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
+Contribution can be done by:
+- Sending a message to the WhatsApp group
+- Writing an email to [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com)
+- Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
+- Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)

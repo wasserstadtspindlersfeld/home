@@ -22,7 +22,7 @@ Additional information
 You can add this page to your home screen to make it easily accessible.
 
 ### iOS
-1. Tap the Share button in the menu bar.
+1. Tap the Share button <img src="https://cdsassets.apple.com/live/7WUAS350/images/ios-apps/keynote/ios13-iwork-share-icon.png" alt="share_button" width="10"/> in the menu bar.
 2. Scroll down the list of options, then tap Add to Home Screen.
 > If you don’t see Add to Home Screen, you can add it. Scroll down to the bottom of the list, tap Edit Actions, then tap  Add to Home Screen.
 

@@ -8,7 +8,7 @@ Hello everyone,
 
 This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
-Table of content
+Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)

@@ -1,6 +1,6 @@
 # User manuals
 
-This document collects the user manuals for the standard equipment in the apartments.
+This document collects the user manuals for the standard equipment in the apartments. If you cannot find your device here, reach out using one of the methods described in the [Contribution](../readme.md#contribution) section.
 
 ## Washing machine
 

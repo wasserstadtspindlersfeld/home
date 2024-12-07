@@ -17,6 +17,20 @@ Table of content
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)
 
+## Add to Home Screen
+
+You can add this page to your home screen to make it easily accessible.
+
+### iOS
+1. Tap the Share button in the menu bar.
+2. Scroll down the list of options, then tap Add to Home Screen.
+> If you don’t see Add to Home Screen, you can add it. Scroll down to the bottom of the list, tap Edit Actions, then tap  Add to Home Screen.
+
+### Android with Chrome
+1. To the right of the address bar, tap `:` and then `Add to home screen` and then `Create shortcut`.
+2. From the dialog that appears: `Rename: Select the default name for the shortcut or rename the shortcut`.
+3. Tap Add.
+
 ## Contribution
 
 Contributions/ideas/recommendations are very welcome. Do not hesitate to reach out if you have an idea how and what to improve.

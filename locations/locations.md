@@ -68,11 +68,24 @@ For the complete list, check the official documentation in the link.
 
 ### Used clothes/shoes
 
-<img src="./resources/clothes_n_shoes.png" alt="container" width="85%"/>
-
 Instead of throwing away the clothes and shoes that you do not want to use anymore, you can take them to the neareast collection point.
+
+#### nearby, in front of the Märkisches Sozial- und Bildungswerk
+
+This one is rather small, but it is super close.
+
+<img src="./resources/clothes_n_shoes_2.png" alt="container_2" width="85%"/>
 
 | | |
 |-|-|
-| Languages | German |
+| Address | [near to Ottomar-Geschke-Str. 11, 12555 Berlin](https://maps.app.goo.gl/LEE3n2acY3wqqhVV8) |
+
+#### near S-Bahn Spindlersfeld
+
+This one has more containers, but it is a bit farther away.
+
+<img src="./resources/clothes_n_shoes.png" alt="container" width="85%"/>
+
+| | |
+|-|-|
 | Address | [near to Ottomar-Geschke-Str. 48, 12555 Berlin](https://maps.app.goo.gl/AMJGdA2Wq7VySqAc6) |

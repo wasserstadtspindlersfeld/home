@@ -12,8 +12,8 @@ Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)
-- [User manuals](./manuals/manuals.md)
 - [Maps](./maps/maps.md)
+- [User manuals](./manuals/manuals.md)
 
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)

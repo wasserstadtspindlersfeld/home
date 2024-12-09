@@ -13,6 +13,7 @@ Table of contents
 - [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)
 - [User manuals](./manuals/manuals.md)
+- [Maps](./maps/maps.md)
 
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)

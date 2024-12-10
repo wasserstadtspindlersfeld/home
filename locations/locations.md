@@ -45,7 +45,6 @@ Sections
 
 | | |
 |-|-|
-| Name | Multiple doctors are available |
 | Languages | German, English (secretary service is only available in German) |
 | Phone | [030/5143760](tel:0305143760) |
 | Address | [Alt-Biesdorf 22, 12683 Berlin](https://maps.app.goo.gl/8Go3UXew5Ad9HEuB9) |

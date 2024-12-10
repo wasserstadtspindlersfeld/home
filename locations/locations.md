@@ -12,7 +12,7 @@ Sections
 
 ### Praxisgemeinschaft Freiheit 1
 
-<img src="./resources/feriheit_1.png" alt="freiheit_1" width="85%"/>
+<img src="./resources/feriheit_1.png" alt="freiheit_1" width="100%"/>
 
 | | |
 |-|-|
@@ -25,7 +25,7 @@ Sections
 
 ### Dr. Karsten Lange
 
-<img src="./resources/karsten_lange_entrance.png" alt="karsten_lange" width="85%"/>
+<img src="./resources/karsten_lange_entrance.png" alt="karsten_lange" width="100%"/>
 
 | | |
 |-|-|
@@ -41,7 +41,7 @@ Sections
 
 ### AniCura Berlin-Biesdorf GbmH
 
-<img src="./resources/tierkilnik_biesdorf.png" alt="tierklinik_biesdorf" width="85%"/>
+<img src="./resources/tierkilnik_biesdorf.png" alt="tierklinik_biesdorf" width="100%"/>
 
 | | |
 |-|-|
@@ -57,7 +57,7 @@ Sections
 
 Professional copy service, you can print hundreds of pages - colored or black and white.
 
-<img src="./resources/copy_magnusstr.png" alt="Repro Kopier" width="85%"/>
+<img src="./resources/copy_magnusstr.png" alt="Repro Kopier" width="100%"/>
 
 | | |
 |-|-|
@@ -71,7 +71,7 @@ Professional copy service, you can print hundreds of pages - colored or black an
 
 ### Recyclinghof Oberspreestraße
 
-<img src="./resources/bsr_recyclehof.png" alt="recyclehof" width="85%"/>
+<img src="./resources/bsr_recyclehof.png" alt="recyclehof" width="100%"/>
 
 A place to take the following kind of garbage:
 - Old batteries (rechargable as well)
@@ -94,7 +94,7 @@ Instead of throwing away the clothes and shoes that you do not want to use anymo
 
 This one is rather small, but it is super close.
 
-<img src="./resources/clothes_n_shoes_2.png" alt="container_2" width="85%"/>
+<img src="./resources/clothes_n_shoes_2.png" alt="container_2" width="100%"/>
 
 | | |
 |-|-|
@@ -104,7 +104,7 @@ This one is rather small, but it is super close.
 
 This one has more containers, but it is a bit farther away.
 
-<img src="./resources/clothes_n_shoes.png" alt="container" width="85%"/>
+<img src="./resources/clothes_n_shoes.png" alt="container" width="100%"/>
 
 | | |
 |-|-|

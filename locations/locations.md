@@ -2,6 +2,12 @@
 
 This page lists some of the important and useful locations around the area. If you have a recommendation, reach out using one of the methods described in the [Contribution](../readme.md#contribution) section.
 
+Sections
+  - [Doctors](#doctors)
+  - [Vets / animal clinic](#vets--animal-clinic)
+  - [Printing](#printing)
+  - [Garbage collection and recycling](#garbage-collection-and-recycling)
+
 ## Doctors
 
 ### Praxisgemeinschaft Freiheit 1
@@ -30,6 +36,20 @@ This page lists some of the important and useful locations around the area. If y
 | Address | [Rudower Ch 12B, 12489 Berlin](https://maps.app.goo.gl/wHjzwBcPSFx6VwMy8) |
 | Phone | [030 - 67 19 88 88](03067198888) |
 | Website | [https://www.doctolib.de/allgemeiner-chirurg/berlin/karsten-lange-berlin?pid=practice-223319](https://www.doctolib.de/allgemeiner-chirurg/berlin/karsten-lange-berlin?pid=practice-223319) |
+
+## Vets / animal clinic
+
+### AniCura Berlin-Biesdorf GbmH
+
+<img src="./resources/tierkilnik_biesdorf.png" alt="tierklinik_biesdorf" width="85%"/>
+
+| | |
+|-|-|
+| Name | Multiple doctors are available |
+| Languages | German, English (secretary service is only available in German) |
+| Phone | [030/5143760](tel:0305143760) |
+| Address | [Alt-Biesdorf 22, 12683 Berlin](https://maps.app.goo.gl/8Go3UXew5Ad9HEuB9) |
+| Website | [https://www.tierklinik-in-biesdorf.de](https://www.tierklinik-in-biesdorf.de/) |
 
 ## Printing
 
@@ -70,7 +90,7 @@ For the complete list, check the official documentation in the link.
 
 Instead of throwing away the clothes and shoes that you do not want to use anymore, you can take them to the neareast collection point.
 
-#### nearby, in front of the Märkisches Sozial- und Bildungswerk
+#### in front of the Märkisches Sozial- und Bildungswerk
 
 This one is rather small, but it is super close.
 

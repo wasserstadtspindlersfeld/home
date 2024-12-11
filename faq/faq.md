@@ -41,6 +41,14 @@ Here is a video tutorial created by one of the WhatsApp group members.
 
 <video src="./resources/heating_tutorial.mp4"  width="100%" controls></video>
 
+## I need to move large items, like furniture, matress or a Christmas tree - how can I do it?
+
+If you have a driver's license, the easiest - and probably also the cheapest - way is to rent a car/van. For example with Miles, it is very simple to rent a van. Do not be afraid of the size, they are very easy to drive thanks to the huge amount of mirrors and the reverse camera. According to many people, they are easier to drive than most of the normal cars.
+
+Link: [https://miles-mobility.com/en-de/car-sharing/fleet](https://miles-mobility.com/en-de/car-sharing/fleet)
+
+You can also use a classical car renting service, for example there is a [Sixt](https://maps.app.goo.gl/U9kHDZdnmJA2JeCR6) car renting office near Adlershof.
+
 ## My question is not answered here, what should I do?
 
 Ask your question in the WhatsApp group, get a coffee and wait for the answer.

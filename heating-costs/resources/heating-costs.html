@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Heating and water cost estimation</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16"></script>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 2px 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Heating and water cost estimation</h1>
+        <p>Based on the bills from previous years. Remember that prices change each year, and they mostly go up.</p>
+        <p>Not included are Betriebskosten (services charges).</p>
+
+        <table>
+            <tr><th>Tariff</th><th></th><th></th></tr>
+            <tr>
+                <td>Year</td>
+                <td>
+                    <select v-model="input.Year"><option v-for="y in years" :value="y">{{ y }}</option></select>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Wing</td>
+                <td>
+                    <select v-model="input.Tariff"><option v-for="t in tariffs" :value="t">{{ t }}</option></select>
+                <td></td>
+            </tr>
+            <tr><th>Your apartment</th><th></th><th></th></tr>
+            <tr>
+                <td>Living area</td>
+                <td><input v-model="input.LivingArea" type="text"/></td>
+                <td>square meters</td>
+            </tr>
+            <tr>
+                <td>Heating area<br><small>(Living area without balcony or terrace)</small></td>
+                <td><input v-model="input.HeatingArea" type="text"/></td>
+                <td>square meters</td>
+            </tr>
+            <tr><th>Your consumption</th><th></th><th></th></tr>
+            <tr>
+                <td>Heating units</td>
+                <td><input v-model="input.HeatingUnits" type="text"/></td>
+                <td>kilowatt hours</td>
+            </tr>
+            <tr>
+                <td>Warm water</td>
+                <td><input v-model="input.WarmWater" type="text"/></td>
+                <td>cubic meters</td>
+            </tr>
+            <tr>
+                <td>Cold water</td>
+                <td><input v-model="input.ColdWater" type="text"/></td>
+                <td>cubic meters</td>
+            </tr>
+        </table>
+
+        <br>
+        <button v-on:click="calculate">Calculate</button>
+        <br>
+        <p>Estimated costs for heating and water: {{ output.CostEstimation }} €</p>
+    </div>
+    <script src="mathHelper.js"></script>
+    <script src="tariffs.js"></script>
+    <script src="calculator.js"></script>
+</body>
+</html>

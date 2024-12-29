@@ -14,6 +14,7 @@ Table of contents
 - [Locations nearby](./locations/locations.md)
 - [Maps](./maps/maps.md)
 - [User manuals](./manuals/manuals.md)
+- [Heating costs](./heating-costs/heating-costs.md)
 
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)

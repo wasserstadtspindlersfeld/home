@@ -22,6 +22,7 @@ You can also add the dates to the calendar on your phone by clicking on the `.ic
 | | |
 |-|-|
 | Abfuhrkalender 2024 | [Abfuhrkalender_2024.ics](./resources/Abfuhrkalender_2024.ics) |
+| Abfuhrkalender 2025 | [Abfuhrkalender_2025.ics](./resources/Abfuhrkalender_2025.ics) |
 
 ## The fan in the bathroom is always on, is this normal?
 
@@ -52,3 +53,7 @@ You can also use a classical car renting service, for example there is a [Sixt](
 ## My question is not answered here, what should I do?
 
 Ask your question in the WhatsApp group, get a coffee and wait for the answer.
+
+## Telekom sales people are bothering me, what can I do?
+
+As a first attempt, you can print the [Telekom notice.pdf](./resources/telekom_notice.pdf) document and stick it on your door. There is also a blacklist you can apply to, but the method is not 100% clear yet.

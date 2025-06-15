@@ -46,6 +46,6 @@ Go to the `Settings/Register new equipment` in the app and use the data from Ste
 
 After a successful setup, you should see something like this:
 
-<img src="resources/ac_control_mobile_app.png" alt="drawing" width="200"/>
+<img src="resources/ac_remote_app.png" alt="drawing" width="200"/>
 
 #### 4. Enjoy the summer! 

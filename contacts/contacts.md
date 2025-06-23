@@ -1,8 +1,8 @@
 # Contacts
 
-## Bock Hausverwaltung
+## Bock Hausservice
 
-General Hausverwaltung company, that is responsible for most of the apartments in the building.
+General Hausservice company, that is responsible for most of the apartments in the building.
 
 Typical topics:
 - Problems with keys (lost, stolen)

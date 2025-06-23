@@ -16,10 +16,10 @@ Typical topics:
 
 | | |
 |-|-|
-| Phone (Mo-Fr, 9-12 Uhr) | [07123 9345-01](tel:07123934501) |
-| E-Mail  | [mail@bock-online.de](mailto:mail@bock-online.de) |
-| 24/7 hotline | [07123 9345-15](tel:07123934515) |
-| Website | [https://hausverwaltung-bock.com](https://hausverwaltung-bock.com) |
+| Phone (Mo-Fr, 9-15 Uhr) | [030 449 65 90](tel:0304496590) |
+| E-Mail  | [office@bock-hausservice.de](mailto:office@bock-hausservice.de) |
+| 24/7 hotline | [0171-424 07 00](tel:01714240700) |
+| Website | [https://bock-hausservice-gmbh.de](https://bock-hausservice-gmbh.de) |
 
 ### Direct contact
 

@@ -12,9 +12,9 @@ This map is a [Google Earth Project](https://earth.google.com/earth/d/1wL9vX30Bz
 
 ### Some maps are prepared to be printed, please mark the actual location with a circle after printing it.
 
-|||
-|-|-|
-| Printable version, black and white | [Download](./resources/wings_bw.pdf) |
-| Printable version, color | [Download](./resources/wings_colored.pdf) |
-| Printer friendly, black and white | [Download](./resources/wings_printer_friendly_bw.pdf) |
-| Printer friendly, colored | [Download](./resources/wings_printer_friendly_colored.pdf) |
+||||
+|-|-|-|
+|Building wings | color | [Download](./resources/wings_colored.pdf) |
+|Building wings | black and white | [Download](./resources/wings_bw.pdf) |
+|Building entrances and wings | Printer friendly, colored | [Download](./resources/entrances_and_wings_colored.pdf) |
+|Building entrances and wings | Printer friendly, black and white | [Download](./resources/entrances_and_wings_black_and_white.pdf) |

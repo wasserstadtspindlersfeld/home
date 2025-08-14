@@ -46,5 +46,5 @@ Contribution can be done by:
 
 <link rel="apple-touch-icon" sizes="180x180" href="[./resources/home_icon.png](https://wasserstadtspindlersfeld.github.io/home/resources/home_icon.png)">
 <link rel="manifest" href="https://wasserstadtspindlersfeld.github.io/home/resources/manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="https://wasserstadtspindlersfeld.github.io/home//resources/home_icon_32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="https://wasserstadtspindlersfeld.github.io/home//resources/home_icon_96.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://wasserstadtspindlersfeld.github.io/home/resources/home_icon_32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://wasserstadtspindlersfeld.github.io/home/resources/home_icon_96.png">

@@ -44,5 +44,5 @@ Contribution can be done by:
 - Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
 - Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
 
-<link rel="apple-touch-icon" sizes="180x180" href="./resources/home_icon.png">
-<link rel="manifest" href="./resources/manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="[./resources/home_icon.png](https://wasserstadtspindlersfeld.github.io/home/resources/home_icon.png)">
+<link rel="manifest" href="https://wasserstadtspindlersfeld.github.io/home/resources/manifest.json">

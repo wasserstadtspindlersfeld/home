@@ -43,3 +43,6 @@ Contribution can be done by:
 - Writing an email to [spindlersfeldwasserstadt@gmail.com](mailto:spindlersfeldwasserstadt@gmail.com)
 - Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
 - Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
+
+<link rel="apple-touch-icon" sizes="180x180" href="./resources/home_icon.png">
+<link rel="manifest" href="./resources/manifest.json">

@@ -1,0 +1,15 @@
+{
+  "name": "Wasserstadt Spindlersfeld Website",
+  "short_name": "WS website",
+  "icons": [
+    {
+      "src": "./resources/home_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}

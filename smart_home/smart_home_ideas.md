@@ -1,12 +1,10 @@
 # Smart Home Solutions
 
-Here you can find ideas about how you can make your home more secure.
+**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
 
 ## Introduction
 
-**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
-
-So, let's dig into it. This page is collecting some ideas about different Smart Home setups that could help you to make your home safer.
+The main goal of this page is to give you ideas about how to have a Smart Home setup to improve the security of your home. All the recommended devices you should buy on your own (except the kit 3), but you can always use our WhatsApp group or contact me directly for support.
 
  Here are some typical use cases for a cool Smart Home setup:
 - Get a notification on your phone if someone is in your apartment while you are away (burglars, crazy ex or just ghosts!)
@@ -102,6 +100,8 @@ The following things are possible
 - Self-hosted video storage - so no monthly fees and backup to a desired cloud provider
 - Single point of control, every smart home item can be controlled from the Home Assistant interface
 - User management, you can add guests and control their access levels
+
+For details, contact me on WhatsApp or use the common group chat.
 
 #### Example photos
 

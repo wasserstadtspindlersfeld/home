@@ -8,6 +8,8 @@ Hello everyone,
 
 This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
+**If you find this helpful, consider buying me a coffee here: https://buymeacoffee.com/tamasfulop**
+
 Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
@@ -16,6 +18,7 @@ Table of contents
 - [Heating costs](./heating-costs/heating-costs.md)
 - [User manuals](./manuals/manuals.md)
 - [Tutorials](./tutorials/tutorials.md)
+- [Smart Home Solutions](./smart_home/smart_home_ideas.md)
 
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)
@@ -44,7 +47,4 @@ Contribution can be done by:
 - Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
 - Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
 
-<link rel="apple-touch-icon" sizes="180x180" href="[./resources/home_icon.png](https://wasserstadtspindlersfeld.github.io/home/resources/home_icon.png)">
-<link rel="manifest" href="https://wasserstadtspindlersfeld.github.io/home/resources/manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="https://wasserstadtspindlersfeld.github.io/home/resources/home_icon_32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="https://wasserstadtspindlersfeld.github.io/home/resources/home_icon_96.png">
+**If you find this helpful, you can consider buying me a coffee here: https://buymeacoffee.com/tamasfulop**

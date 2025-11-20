@@ -4,7 +4,7 @@ Here you can find ideas about how you can make your home more secure.
 
 ## Introduction
 
-**If you find this helpful, you can consider buying me a coffee here: https://buymeacoffee.com/tamasfulop**
+**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
 
 So, let's dig into it. This page is collecting some ideas about different Smart Home setups that could help you to make your home safer.
 
@@ -112,4 +112,4 @@ The following things are possible
 Costs are hard to estimate here, but it starts around 200 EUR and depending on how many smart items you want it can go higher.
 
 
-**If you find this helpful, you can consider buying me a coffee here: https://buymeacoffee.com/tamasfulop**
+**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)

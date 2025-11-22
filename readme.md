@@ -8,8 +8,6 @@ Hello everyone,
 
 This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
-**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
-
 Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
@@ -47,4 +45,4 @@ Contribution can be done by:
 - Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
 - Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
 
-**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
+**If you find this helpful, you can support the page by buying a coffee for me:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)

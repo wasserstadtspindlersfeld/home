@@ -1,7 +1,5 @@
 # Smart Home Solutions
 
-**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
-
 ## Introduction
 
 The main goal of this page is to give you ideas about how to have a Smart Home setup to improve the security of your home. All the recommended devices you should buy on your own (except the kit 3), but you can always use our WhatsApp group or contact me directly for support.
@@ -110,6 +108,3 @@ For details, contact me on WhatsApp or use the common group chat.
 
 #### Cost estimation
 Costs are hard to estimate here, but it starts around 200 EUR and depending on how many smart items you want it can go higher.
-
-
-**If you find this helpful, you can consider buying me a coffee here:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)

@@ -12,10 +12,9 @@ Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
 - [Locations nearby](./locations/locations.md)
+- [Heating costs calculator](./heating-costs/heating-costs.md)
 - [Maps](./maps/maps.md)
-- [Heating costs](./heating-costs/heating-costs.md)
 - [User manuals](./manuals/manuals.md)
-- [Tutorials](./tutorials/tutorials.md)
 - [Smart Home Solutions](./smart_home/smart_home_ideas.md)
 
 Additional information

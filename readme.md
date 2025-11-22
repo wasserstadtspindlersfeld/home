@@ -45,4 +45,4 @@ Contribution can be done by:
 - Creating an [issue](https://github.com/wasserstadtspindlersfeld/home/issues)
 - Creating a [pull request](https://github.com/wasserstadtspindlersfeld/home/pulls)
 
-**If you find this helpful, you can support the page by buying a coffee for me:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)
+**I am maintaining this website in my free time with the help of some people. You can support this by buying me a coffee:** [https://buymeacoffee.com/tamasfulop](https://buymeacoffee.com/tamasfulop)

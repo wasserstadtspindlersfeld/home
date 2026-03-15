@@ -1,6 +1,6 @@
 # Wasserstadt Spindlersfeld
 
-![Building](locations/resources/building_xmas_2025.png)
+![Building](locations/resources/building_spring.png)
 
 ## Welcome
 

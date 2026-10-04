@@ -24,6 +24,8 @@ defaults:
     values: { layout: page }
   - scope: { path: "readme.md" }
     values: { layout: home }
+  - scope: { path: "maps/maps.md" }
+    values: { layout: map }
   - scope: { path: "faq/faq.md" }
     values: { toc: true }
   - scope: { path: "smart_home/smart_home_ideas.md" }

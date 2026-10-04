@@ -1,0 +1,32 @@
+# Text for the 3D building map on the Maps page.
+# The shapes of the wings live in _src/building-3d/geometry.js.
+
+# Door numbers are wing.floor.door. de = the German name people see on doorbells and letters.
+floors:
+  - { n: 0, en: "Ground floor", de: "EG" }
+  - { n: 1, en: "1st floor", de: "1. OG" }
+  - { n: 2, en: "2nd floor", de: "2. OG" }
+  - { n: 3, en: "3rd floor", de: "3. OG" }
+  - { n: 4, en: "4th floor", de: "4. OG" }
+
+# Wing colours follow the printed maps. Each is named after a dye the W. Spindler
+# works could have used. ink = text colour that stays readable on the swatch.
+wings:
+  - { n: 1, color: "#E8892B", ink: "#1d2523", dye: "Saffron", where: "Northwest corner, along Adolf-Heyden-Straße" }
+  - { n: 2, color: "#C8463D", ink: "#ffffff", dye: "Madder red", where: "North side, along Carl-Spindler-Straße" }
+  - { n: 3, color: "#8E4FA0", ink: "#ffffff", dye: "Orchil purple", where: "North side, middle and east, along Carl-Spindler-Straße" }
+  - { n: 4, color: "#4F82C0", ink: "#ffffff", dye: "Woad blue", where: "Northeast corner, facing the Spree" }
+  - { n: 5, color: "#E2BE34", ink: "#1d2523", dye: "Weld yellow", where: "Inside the courtyard, joined to the north side" }
+  - { n: 6, color: "#2E9A84", ink: "#ffffff", dye: "Malachite green", where: "East side, facing the Spree" }
+  - { n: 7, color: "#8A5A3E", ink: "#ffffff", dye: "Cutch brown", where: "South side, east half, along Henriette-Lustig-Straße" }
+  - { n: 8, color: "#D2378F", ink: "#ffffff", dye: "Fuchsine", where: "South side, west half, along Henriette-Lustig-Straße" }
+  - { n: 9, color: "#26457D", ink: "#ffffff", dye: "Prussian blue", where: "Southwest corner, along Adolf-Heyden-Straße" }
+
+# Street entrances marked on the printable map. wings = the wings whose facade the entrance is on.
+entrances:
+  - { id: cs13, label: "Carl-Spindler-Str. 13", wings: [4] }
+  - { id: cs15, label: "Carl-Spindler-Str. 15", wings: [3] }
+  - { id: ah1, label: "Adolf-Heyden-Str. 1", wings: [1] }
+  - { id: ah3, label: "Adolf-Heyden-Str. 3 (garage)", wings: [] }
+  - { id: ah5, label: "Adolf-Heyden-Str. 5", wings: [9] }
+  - { id: hl14, label: "Henriette-Lustig-Str. 14", wings: [7, 8] }

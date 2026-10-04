@@ -1,0 +1,11 @@
+---
+layout: default
+---
+{%- assign section = site.data.sections | where: "url", page.url | first -%}
+<main id="main" class="page page-map">
+  {% include page-head.html section=section %}
+  {% include building-3d.html %}
+  <article class="prose">
+{{ content }}
+  </article>
+</main>

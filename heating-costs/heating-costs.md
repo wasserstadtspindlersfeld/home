@@ -15,7 +15,7 @@ The rates for heating and water vary depending on the wing of the building.
 
 Here is a tool to estimate your heating and water costs, based on the rates from previous years:
 
-- [Link to calculator](https://wasserstadtspindlersfeld.github.io/home/heating-costs/resources/heating-costs.html)
+- [Link to calculator](./resources/heating-costs.html)
 
 Read your meters and calculate the difference to the last reading.
 You will find those values on your last utility bill or your handover protocol.

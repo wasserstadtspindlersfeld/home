@@ -8,7 +8,7 @@ import {
   NeutralToneMapping, DoubleSide, TOUCH, MOUSE,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MASSES, FLOORS, ENTRANCES, NORTH, PAVILION_TOP, LINK_TOP, STREETS, toWorld } from './geometry.js';
+import { MASSES, FLOORS, ENTRANCES, NORTH, PAVILION_TOP, LINK_TOP, STREETS, RIVER_BANK, toWorld } from './geometry.js';
 import { facadeCanvas, groundCanvas, roofCanvas, BAYS, BAY_WIDTH, GROUND } from './textures.js';
 import { parseDoor, doorHash } from './door.js';
 
@@ -194,7 +194,6 @@ function createUI(root, data) {
     },
     entranceLabel: (id) => (entrances.get(id) || {}).label || '',
     wing: (n) => wings.get(n),
-    floorName: ordinal,
   };
 }
 
@@ -561,6 +560,7 @@ function createViewer(root, data, ui, reduceMotion) {
   let flight = null;
   function flyTo(view, duration = 1200) {
     const to = placeFor(view);
+    streetLabels.forEach((st) => { st.cur = null; }); // a new view starts from the usual spots
     const fromP = camera.position.clone(), fromT = controls.target.clone();
     if (flight) tweens.delete(flight);
     flight = tween(duration, (e) => {
@@ -638,79 +638,156 @@ function createViewer(root, data, ui, reduceMotion) {
     labelsBox.appendChild(el);
     const [x, z] = toWorld(e.at[0], e.at[1]);
     const out = { n: [0, -1.2], s: [0, 1.2], w: [-1.2, 0], e: [1.2, 0] }[e.face];
-    return { el, data: e, pos: new Vector3(x + out[0] * 2, 4.5, z + out[1] * 2) };
+    return { el, label: el.querySelector('.b3d-pin-label'), data: e, pos: new Vector3(x + out[0] * 2, 4.5, z + out[1] * 2) };
   });
-  // street names float above the ground and stay upright, turned along their street
-  const streetLabels = STREETS.map((st) => {
-    const el = document.createElement('div');
-    el.className = 'b3d-street';
-    el.textContent = st.name;
-    labelsBox.appendChild(el);
-    const [x, z] = toWorld(st.label[0], st.label[1]);
-    const seg = st.path.length > 2 && st.label[1] === st.path[0][1] ? [st.path[0], st.path[1]] : [st.path[0], st.path[st.path.length - 1]];
-    const [ax, az] = toWorld(seg[0][0], seg[0][1]);
-    const [bx, bz] = toWorld(seg[1][0], seg[1][1]);
-    const len = Math.hypot(bx - ax, bz - az);
-    return { el, pos: new Vector3(x, 0.6, z), dir: new Vector3((bx - ax) / len, 0, (bz - az) / len) };
-  });
-  {
-    const el = document.createElement('div');
-    el.className = 'b3d-street is-river';
-    el.textContent = 'Spree';
-    labelsBox.appendChild(el);
-    const [x, z] = toWorld(690, 470);
-    const [ax, az] = toWorld(608, 420), [bx, bz] = toWorld(614, 550);
-    const len = Math.hypot(bx - ax, bz - az);
-    streetLabels.push({ el, pos: new Vector3(x, 0.6, z), dir: new Vector3((bx - ax) / len, 0, (bz - az) / len) });
+  // street names float above the ground and stay upright, turned along their street.
+  // Each name has a few spots along its street, nearest to its usual place first.
+  function lineSpots(path, prefer, step, margin) {
+    const spots = [];
+    path.slice(1).forEach((b, i) => {
+      const a = path[i];
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const [ax, az] = toWorld(a[0], a[1]), [bx, bz] = toWorld(b[0], b[1]);
+      const dir = new Vector3(bx - ax, 0, bz - az).normalize();
+      const at = (t) => {
+        const u = a[0] + (b[0] - a[0]) * t, v = a[1] + (b[1] - a[1]) * t;
+        const [x, z] = toWorld(u, v);
+        spots.push({ pos: new Vector3(x, 0.6, z), dir, d: Math.hypot(u - prefer[0], v - prefer[1]) });
+      };
+      // the usual place, on whichever stretch of the street it sits
+      const t0 = ((prefer[0] - a[0]) * (b[0] - a[0]) + (prefer[1] - a[1]) * (b[1] - a[1])) / (len * len);
+      if (t0 >= 0 && t0 <= 1 && Math.hypot(a[0] + (b[0] - a[0]) * t0 - prefer[0], a[1] + (b[1] - a[1]) * t0 - prefer[1]) < 1) at(t0);
+      if (len < margin * 2 + 20) return; // too short to hold a name, like the corner bend
+      const n = Math.max(1, Math.round((len - margin * 2) / step));
+      for (let k = 0; k <= n; k++) at((margin + ((len - margin * 2) * k) / n) / len);
+    });
+    return spots.sort((p, q) => p.d - q.d);
   }
-  const floorTag = document.createElement('div');
-  floorTag.className = 'b3d-floortag';
-  labelsBox.appendChild(floorTag);
-  const floorTagPos = new Vector3();
+  const streetLabels = STREETS.map((st) => ({ name: st.name, spots: lineSpots(st.path, st.label, 50, 40) }));
+  streetLabels.push({ name: 'Spree', river: true, spots: lineSpots(RIVER_BANK.map(([u, v]) => [u + 82, v]), [690, 470], 60, 10) });
+  streetLabels.forEach((st) => {
+    st.el = document.createElement('div');
+    st.el.className = st.river ? 'b3d-street is-river' : 'b3d-street';
+    st.el.textContent = st.name;
+    st.cur = null;
+    labelsBox.appendChild(st.el);
+  });
+  // the buttons and panels that sit on top of the model
+  const overlays = [stage.querySelector('.b3d-compass'), stage.querySelector('.b3d-tools'), root.querySelector('.b3d-floors'), root.querySelector('.b3d-finder'), root.querySelector('.b3d-card')].filter(Boolean);
 
   const proj = new Vector3();
   const ray = new Raycaster();
   const size = new Vector2();
   function place(el, pos, hideBehind) {
     proj.copy(pos).project(camera);
-    const visible = proj.z > -1 && proj.z < 1;
-    renderer.getSize(size);
     const x = (proj.x * 0.5 + 0.5) * size.x, y = (-proj.y * 0.5 + 0.5) * size.y;
+    const hidden = !(proj.z > -1 && proj.z < 1) || (hideBehind && behind(pos));
     el.style.setProperty('--x', `${x.toFixed(1)}px`);
     el.style.setProperty('--y', `${y.toFixed(1)}px`);
-    el.classList.toggle('is-flipped', x > size.x - 240); // keep labels clear of the zoom buttons
-    let hidden = !visible;
-    if (!hidden && hideBehind) {
-      const dir = pos.clone().sub(camera.position);
-      const dist = dir.length();
-      ray.set(camera.position, dir.normalize());
-      ray.far = dist - 1.5;
-      hidden = ray.intersectObjects(pickables, false).some((h) => h.object.material.opacity > 0.5);
-    }
     el.classList.toggle('is-hidden', hidden);
+    return { x, y, hidden };
+  }
+  function behind(pos) {
+    const dir = pos.clone().sub(camera.position);
+    const dist = dir.length();
+    ray.set(camera.position, dir.normalize());
+    ray.far = dist - 1.5;
+    return ray.intersectObjects(pickables, false).some((h) => h.object.material.opacity > 0.5);
+  }
+
+  // Labels keep out of each other's way. Entrance addresses avoid the wing badges and
+  // the buttons; street names avoid all of that plus the pins and the other names.
+  // A box is a centre, a half width and height, and a turn, in pixels on the stage.
+  const screenBox = (x, y, hw, hh, ang = 0) => ({ x, y, hw, hh, ang, cos: Math.cos(ang), sin: Math.sin(ang) });
+  function overlap(a, b) { // separating axis test for two turned boxes
+    const dx = b.x - a.x, dy = b.y - a.y;
+    return [[a.cos, a.sin], [-a.sin, a.cos], [b.cos, b.sin], [-b.sin, b.cos]].every(([ux, uy]) => {
+      const ra = a.hw * Math.abs(ux * a.cos + uy * a.sin) + a.hh * Math.abs(uy * a.cos - ux * a.sin);
+      const rb = b.hw * Math.abs(ux * b.cos + uy * b.sin) + b.hh * Math.abs(uy * b.cos - ux * b.sin);
+      return Math.abs(dx * ux + dy * uy) <= ra + rb;
+    });
+  }
+  function onStage(b) {
+    const ex = b.hw * Math.abs(b.cos) + b.hh * Math.abs(b.sin), ey = b.hw * Math.abs(b.sin) + b.hh * Math.abs(b.cos);
+    return b.x - ex >= 0 && b.y - ey >= 0 && b.x + ex <= size.x && b.y + ey <= size.y;
+  }
+  function blockers() { // the wing badges, and the buttons and panels over the model
+    const o = labelsBox.getBoundingClientRect();
+    const list = [];
+    const add = (el, pad) => {
+      const r = el.getBoundingClientRect();
+      if (r.width) list.push(screenBox(r.left - o.left + r.width / 2, r.top - o.top + r.height / 2, r.width / 2 + pad, r.height / 2 + pad));
+    };
+    badges.forEach(({ el }) => { if (!el.classList.contains('is-hidden')) add(el, 4); });
+    overlays.forEach((el) => add(el, 2));
+    return list;
+  }
+  // an entrance's address goes right of its pin, else left, else below: wherever it is clear.
+  // Below, it slides sideways to stay on screen when the pin is near an edge.
+  const SIDES = ['', 'is-flipped', 'is-below'];
+  function placeAddress(p, at, mark, taken) {
+    if (!p.lw) { p.lw = p.label.offsetWidth; p.lh = p.label.offsetHeight; }
+    const hw = p.lw / 2 + 3, hh = p.lh / 2 + 3, y = at.y - 31 + p.lh / 2;
+    const below = Math.min(Math.max(at.x, hw + 2), size.x - hw - 2);
+    p.el.style.setProperty('--dx', `${(below - at.x).toFixed(1)}px`);
+    const spot = {
+      '': screenBox(at.x + 18 + p.lw / 2, y, hw, hh),
+      'is-flipped': screenBox(at.x - 18 - p.lw / 2, y, hw, hh),
+      'is-below': screenBox(below, at.y + 8 + p.lh / 2, hw, hh),
+    };
+    const clear = (side) => onStage(spot[side]) && !taken.some((t) => t !== mark && overlap(spot[side], t));
+    // keep the current side while it works, so the address doesn't hop around mid-drag
+    const side = [p.side, ...SIDES].find((sd) => sd != null && clear(sd)) ?? SIDES.find((sd) => onStage(spot[sd])) ?? '';
+    p.side = side;
+    SIDES.forEach((sd) => { if (sd) p.el.classList.toggle(sd, sd === side); });
+    taken.push(spot[side]);
+  }
+  function fitStreet(st, spot, taken) {
+    proj.copy(spot.pos).project(camera);
+    if (!(proj.z > -1 && proj.z < 1)) return null;
+    const x = (proj.x * 0.5 + 0.5) * size.x, y = (-proj.y * 0.5 + 0.5) * size.y;
+    // angle of the street on screen, flipped so the text never reads upside down
+    proj.copy(spot.pos).addScaledVector(spot.dir, 20).project(camera);
+    const p2x = proj.x, p2y = proj.y;
+    proj.copy(spot.pos).addScaledVector(spot.dir, -20).project(camera);
+    let ang = Math.atan2(-(p2y - proj.y) * size.y, (p2x - proj.x) * size.x);
+    if (ang > Math.PI / 2) ang -= Math.PI;
+    if (ang < -Math.PI / 2) ang += Math.PI;
+    const b = screenBox(x, y, st.w / 2 + 6, st.h / 2 + 3, ang);
+    if (!onStage(b) || taken.some((t) => overlap(b, t)) || behind(spot.pos)) return null; // only whole, clear names
+    return b;
+  }
+  function placeStreets(taken) {
+    streetLabels.forEach((st) => {
+      if (!st.w) { st.w = st.el.offsetWidth; st.h = st.el.offsetHeight; }
+      // stay put while the current spot still works, so names don't hop around mid-drag
+      let i = st.cur, b = i != null ? fitStreet(st, st.spots[i], taken) : null;
+      for (let k = 0; !b && k < st.spots.length; k++) if (k !== st.cur) { i = k; b = fitStreet(st, st.spots[k], taken); }
+      st.el.classList.toggle('is-hidden', !b);
+      if (!b) return;
+      st.cur = i;
+      taken.push(b);
+      st.el.style.setProperty('--x', `${b.x.toFixed(1)}px`);
+      st.el.style.setProperty('--y', `${b.y.toFixed(1)}px`);
+      st.el.style.setProperty('--r', `${((b.ang * 180) / Math.PI).toFixed(1)}deg`);
+    });
   }
   function updateLabels() {
+    renderer.getSize(size);
     badges.forEach(({ el, pos }, n) => {
       place(el, pos, false);
       el.classList.toggle('is-active', selection.wing === n);
       el.classList.toggle('is-muted', selection.wing != null && selection.wing !== n);
     });
-    pins.forEach((p) => {
-      place(p.el, p.pos, true);
+    const at = pins.map((p) => {
       p.el.classList.toggle('is-active', selection.wing != null && p.data.wings.includes(selection.wing));
+      return place(p.el, p.pos, true);
     });
-    streetLabels.forEach((st) => {
-      place(st.el, st.pos, true);
-      // angle of the street on screen, flipped so the text never reads upside down
-      proj.copy(st.pos).addScaledVector(st.dir, 20).project(camera);
-      const p2 = { x: proj.x, y: proj.y };
-      proj.copy(st.pos).addScaledVector(st.dir, -20).project(camera);
-      let ang = (Math.atan2(-(p2.y - proj.y) * size.y, (p2.x - proj.x) * size.x) * 180) / Math.PI;
-      if (ang > 90) ang -= 180;
-      if (ang < -90) ang += 180;
-      st.el.style.setProperty('--r', `${ang.toFixed(1)}deg`);
-    });
-    floorTag.hidden = true; // the floor stepper says which floor it is
+    const taken = blockers();
+    const marks = at.map((a) => (a.hidden ? null : screenBox(a.x, a.y - 17, 15, 19)));
+    marks.forEach((m) => { if (m) taken.push(m); });
+    pins.forEach((p, i) => { if (marks[i] && p.el.classList.contains('is-active')) placeAddress(p, at[i], marks[i], taken); });
+    placeStreets(taken);
     // compass: angle between "up the screen" on the ground and true north
     const az = controls.getAzimuthalAngle();
     const fwd = [-Math.sin(az), -Math.cos(az)];
@@ -776,7 +853,12 @@ function createViewer(root, data, ui, reduceMotion) {
   resize();
 
   applyTheme();
-  if (document.fonts) document.fonts.ready.then(() => { dark = null; applyTheme(); }); // redraw street names once the web font is in
+  if (document.fonts) document.fonts.ready.then(() => { // redraw and re-measure street names once the web font is in
+    streetLabels.forEach((st) => { st.w = 0; });
+    pins.forEach((p) => { p.lw = 0; });
+    dark = null;
+    applyTheme();
+  });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
   new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
@@ -796,25 +878,11 @@ function createViewer(root, data, ui, reduceMotion) {
   return {
     select(sel, source) {
       selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null };
-      if (selection.floor != null) {
-        const b = wingBoxes.get(selection.wing);
-        const f = FLOORS[Math.min(selection.floor, 4)];
-        // put the tag on the facade that faces the camera, at the height of that floor
-        const az = viewFor(selection).azim;
-        const dx = Math.sin(az), dz = Math.cos(az);
-        const hx = (b.x1 - b.x0) / 2, hz = (b.z1 - b.z0) / 2;
-        const t = Math.min(hx / Math.max(Math.abs(dx), 1e-3), hz / Math.max(Math.abs(dz), 1e-3)) + 2;
-        floorTagPos.set((b.x0 + b.x1) / 2 + dx * t, f.y + f.h / 2, (b.z0 + b.z1) / 2 + dz * t);
-        floorTag.innerHTML = `<b>${selection.floor}</b>${ui.floorName(selection.floor)}`;
-        floorTag.style.setProperty('--swatch', ui.wing(selection.wing).color);
-        floorTag.style.setProperty('--plate-ink', ui.wing(selection.wing).ink);
-      }
       applySelection();
       if (!introDone) { pending = selection.wing != null ? selection : null; return; }
       if (source === 'tap' && selection.wing != null) { requestRender(); return; } // keep the camera where the user put it
       flyTo(viewFor(selection));
     },
     render: requestRender,
-    snapshot() { renderer.render(scene, camera); return canvas.toDataURL('image/png'); },
   };
 }

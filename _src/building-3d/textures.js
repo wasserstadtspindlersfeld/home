@@ -11,19 +11,20 @@ function rng(seed) {
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
+// A soft architectural-model look: pale clay with a hint of brick, pale blue glass.
 const PALETTE = {
-  brick: ['#a5432c', '#ad4830', '#9d3f2a', '#b04d34'],
-  mortar: 'rgba(40, 14, 8, 0.10)',
-  stone: '#dacbab',
-  plinth: '#6f2e20',
-  frame: '#f1eee6',
-  glassTop: '#5a6a72',
-  glassBottom: '#26313a',
-  attic: '#e5e8e3',
-  atticLine: '#9ba4a0',
-  plaster: '#e3d1a6',
-  plasterLine: 'rgba(120, 90, 40, 0.18)',
-  surround: '#f4ecd8',
+  brick: ['#ebdcd4', '#e7d6cd', '#efe2da', '#e4d1c7'],
+  mortar: 'rgba(110, 70, 50, 0.045)',
+  stone: '#f8f4f0',
+  plinth: '#dccbc1',
+  frame: '#ffffff',
+  glassTop: '#c6d3e6',
+  glassBottom: '#aebfd8',
+  attic: '#f6f8fb',
+  atticLine: '#d3dae4',
+  plaster: '#f3eada',
+  plasterLine: 'rgba(150, 120, 70, 0.10)',
+  surround: '#fcf9f3',
   lit: ['#ffc56f', '#ffd596', '#ffb85c', '#ffe1ae'],
 };
 
@@ -51,7 +52,7 @@ export function facadeCanvas(kind, finish, night, seed = 1) {
     if (finish === 'brick') {
       for (let i = 0; i < 260; i++) {
         ctx.fillStyle = PALETTE.brick[1 + Math.floor(r() * 3)];
-        ctx.globalAlpha = 0.35;
+        ctx.globalAlpha = 0.22;
         ctx.fillRect(r() * W, Math.floor(r() * H / 3) * 3, 6 + r() * 14, 3);
       }
       ctx.globalAlpha = 1;
@@ -96,7 +97,7 @@ export function facadeCanvas(kind, finish, night, seed = 1) {
       ctx.fillStyle = PALETTE.surround;
       ctx.fillRect(wx - 5, wy - 6, ww + 10, wh + 12);
     } else {
-      ctx.fillStyle = 'rgba(60, 18, 10, 0.25)';
+      ctx.fillStyle = 'rgba(120, 90, 100, 0.14)';
       windowPath(ctx, wx - 4, wy - 3, ww + 8, wh + 6, arch);
       ctx.fill();
     }
@@ -114,14 +115,19 @@ export function facadeCanvas(kind, finish, night, seed = 1) {
   }
 
   if (!night) {
-    if (kind === 'ground' && finish === 'brick') {
-      ctx.fillStyle = PALETTE.plinth;
-      ctx.fillRect(0, H - 12, W, 12);
+    if (kind === 'ground') {
+      if (finish === 'brick') { ctx.fillStyle = PALETTE.plinth; ctx.fillRect(0, H - 10, W, 10); }
+      // soft contact shadow where the walls meet the ground
+      const ao = ctx.createLinearGradient(0, H, 0, H * 0.55);
+      ao.addColorStop(0, 'rgba(70, 60, 80, 0.16)');
+      ao.addColorStop(1, 'rgba(70, 60, 80, 0)');
+      ctx.fillStyle = ao;
+      ctx.fillRect(0, H * 0.55, W, H * 0.45);
     }
     if (kind === 'cornice') {
       ctx.fillStyle = PALETTE.stone;
       ctx.fillRect(0, 0, W, 14);
-      ctx.fillStyle = finish === 'plaster' ? 'rgba(120, 90, 40, 0.35)' : PALETTE.plinth;
+      ctx.fillStyle = finish === 'plaster' ? 'rgba(150, 120, 70, 0.25)' : 'rgba(150, 110, 95, 0.35)';
       for (let x = 2; x < W; x += 10) ctx.fillRect(x, 16, 5, 6); // dentil frieze, as on the real cornice
     }
   }
@@ -132,8 +138,8 @@ export function facadeCanvas(kind, finish, night, seed = 1) {
 export const GROUND = { x0: -280, x1: 280, z0: -280, z1: 280, size: 2048 };
 
 const GROUND_COLORS = {
-  day: { base: '#e3e6df', walk: '#eef0ea', road: '#cfd4cc', lawn: '#c7d7b3', lawnEdge: '#b6c9a0', plaza: '#ece7dc', sand: '#e7d8b4', river: '#a8c6d2', river2: '#8fb4c4', bankGreen: '#cddcbd', label: '#68716c', riverLabel: '#4f7a8d', fade: '#eef0eb', footprint: '#d7dad3' },
-  night: { base: '#1b2120', walk: '#232a28', road: '#141918', lawn: '#1f2b21', lawnEdge: '#26342a', plaza: '#272c29', sand: '#2d2a22', river: '#0f2029', river2: '#0c1a22', bankGreen: '#1d2a20', label: '#8d9894', riverLabel: '#6f9cb0', fade: '#121716', footprint: '#20262a' },
+  day: { base: '#e6eaf1', walk: '#f6f8fb', road: '#dde2ea', lane: '#ffffff', lawn: '#d2e6c9', lawnEdge: '#c2dab7', plaza: '#f1f4f8', sand: '#f1e8d2', river: '#d0e1f4', river2: '#c3d7ef', bankGreen: '#dceed5', label: '#7a8494', riverLabel: '#5b7fb5', fade: '#eceff5', footprint: '#d6dce6' },
+  night: { base: '#141922', walk: '#1a202a', road: '#10141b', lane: '#2b3443', lawn: '#17231b', lawnEdge: '#1e2c22', plaza: '#1a2029', sand: '#25231e', river: '#0e1a2a', river2: '#0b1523', bankGreen: '#152019', fade: '#0f131a', footprint: '#1a202b' },
 };
 
 export function groundCanvas(night, fonts) {
@@ -179,6 +185,11 @@ export function groundCanvas(night, fonts) {
   };
   STREETS.forEach((s) => strokePath(s.path, s.width + 16, C.walk));
   STREETS.forEach((s) => strokePath(s.path, s.width, C.road));
+  // dashed centre lines
+  ctx.save();
+  ctx.setLineDash([len(5), len(6)]);
+  STREETS.forEach((s) => strokePath(s.path, 0.7, C.lane));
+  ctx.restore();
 
   // Courtyard: lawns split by a north-south and an east-west path
   const rect = (u0, u1, v0, v1, color, radius = 6) => {
@@ -205,7 +216,9 @@ export function groundCanvas(night, fonts) {
 
   // fade the edges into the page background
   const fade = ctx.createRadialGradient(S / 2, S / 2, S * 0.3, S / 2, S / 2, S * 0.5);
-  fade.addColorStop(0, 'rgba(0,0,0,0)');
+  // fade from a see-through version of the same colour (fading from transparent black goes grey on the way)
+  const fc = parseInt(C.fade.slice(1), 16);
+  fade.addColorStop(0, `rgba(${fc >> 16}, ${(fc >> 8) & 255}, ${fc & 255}, 0)`);
   fade.addColorStop(1, C.fade);
   ctx.fillStyle = fade;
   ctx.fillRect(0, 0, S, S);
@@ -216,15 +229,15 @@ export function roofCanvas(night) {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const ctx = c.getContext('2d');
-  ctx.fillStyle = night ? '#2a3130' : '#6d7975';
+  ctx.fillStyle = night ? '#262d38' : '#dfe4ec';
   ctx.fillRect(0, 0, 256, 256);
   const r = rng(99);
   for (let i = 0; i < 900; i++) {
-    ctx.fillStyle = night ? 'rgba(255,255,255,0.03)' : `rgba(${r() < 0.5 ? '0,0,0' : '255,255,255'},0.05)`;
+    ctx.fillStyle = night ? 'rgba(255,255,255,0.03)' : `rgba(${r() < 0.5 ? '40,50,70' : '255,255,255'},0.035)`;
     ctx.fillRect(r() * 256, r() * 256, 2, 2);
   }
   // skylights in rows, like the real roofs
-  ctx.fillStyle = night ? '#3b4442' : '#c9d0cd';
+  ctx.fillStyle = night ? '#323b48' : '#f6f8fb';
   for (let y = 24; y < 256; y += 64) for (let x = 14; x < 256; x += 42) ctx.fillRect(x, y, 16, 22);
   return c;
 }

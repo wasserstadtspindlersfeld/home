@@ -1,12 +1,9 @@
 The fonts in this folder are self-hosted so visitors' browsers never contact a font service.
 
-archivo.woff2, archivo-italic.woff2:
-Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+fira-sans-*.woff2, fira-sans-condensed-*.woff2 (Fira Sans, by Erik Spiekermann, Ralph du Carrois and team):
+Digitized data copyright 2012-2016, The Mozilla Foundation and Telefonica S.A.
 
-gloock.woff2:
-Copyright 2022 The Gloock Project Authors (https://github.com/duartp/gloock)
-
-Both are licensed under the SIL Open Font License, Version 1.1.
+They are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
 https://openfontlicense.org
 

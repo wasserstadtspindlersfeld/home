@@ -1,23 +1,21 @@
 <header class="masthead">
- <div class="masthead-inner">
-  <div class="masthead-bar">
+  <div class="masthead-inner">
     <a class="brand" href="{{ '/' | relative_url }}" aria-label="Wasserstadt Spindlersfeld, home page">
-      {% include logo.html class="brand-mark" %}
+      {% include symbol.html %}
       <span class="brand-text">
-        <span class="brand-eyebrow">Residents' guide</span>
         <span class="brand-name">Wasserstadt Spindlersfeld</span>
+        <span class="brand-sub">Residents' guide</span>
       </span>
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-      {% include icon.html name="menu" %}{% include icon.html name="close" %}<span>Menu</span>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+      {% include icon.html name="menu" weight=2 %}{% include icon.html name="close" weight=2 %}
     </button>
+    <nav id="site-nav" class="site-nav" aria-label="Sections" data-open="false">
+      <ul>
+        {%- for s in site.data.sections %}
+        <li><a class="dir-row" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}><span class="plate">{% include icon.html name=s.icon weight=2 %}</span><span class="dir-text"><span class="dir-title">{{ s.title }}</span></span>{% include icon.html name="arrow" weight=2 %}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
   </div>
-  <nav id="site-nav" class="site-nav" aria-label="Sections" data-open="false">
-    <ul>
-      {%- for s in site.data.sections %}
-      <li><a href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}>{% include icon.html name=s.icon %}<span>{{ s.title }}</span></a></li>
-      {%- endfor %}
-    </ul>
-  </nav>
- </div>
 </header>

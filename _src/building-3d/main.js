@@ -2,7 +2,7 @@
 // and the model shows the wing and lifts the storeys above that floor.
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Color, Fog, HemisphereLight, DirectionalLight,
-  Group, Mesh, BufferGeometry, Float32BufferAttribute, MeshStandardMaterial, CanvasTexture,
+  Group, Mesh, BufferGeometry, Float32BufferAttribute, MeshStandardMaterial, MeshLambertMaterial, CanvasTexture,
   RepeatWrapping, ClampToEdgeWrapping, SRGBColorSpace, PlaneGeometry, Vector3, Vector2, Raycaster,
   InstancedMesh, IcosahedronGeometry, CylinderGeometry, Matrix4, Quaternion, PCFSoftShadowMap,
   NeutralToneMapping, DoubleSide, TOUCH, MOUSE,
@@ -43,6 +43,36 @@ function createUI(root, data) {
   const chipsBox = root.querySelector('.b3d-wings');
   const card = root.querySelector('.b3d-card');
   const emptyCard = card.innerHTML;
+  const stepper = root.querySelector('.b3d-floors');
+  const stepsBox = stepper.querySelector('.b3d-floors-steps');
+  data.floors.forEach((f) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'b3d-step';
+    b.dataset.floor = f.n;
+    b.textContent = f.n;
+    b.setAttribute('aria-label', `${f.en} (${f.de})`);
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => {
+      if (current.wing == null) return;
+      select({ wing: current.wing, floor: current.floor === f.n ? null : f.n, door: null }, 'stepper');
+    });
+    stepsBox.appendChild(b);
+  });
+  function renderStepper(sel) {
+    stepper.hidden = sel.wing == null;
+    if (sel.wing == null) return;
+    const w = wings.get(sel.wing);
+    stepper.style.setProperty('--swatch', w.color);
+    stepper.style.setProperty('--plate-ink', w.ink);
+    stepsBox.querySelectorAll('.b3d-step').forEach((b) => {
+      const n = Number(b.dataset.floor);
+      b.classList.toggle('is-current', sel.floor === n);
+      b.classList.toggle('is-below', sel.floor != null && n < sel.floor);
+      b.classList.toggle('is-above', sel.floor != null && n > sel.floor);
+      b.setAttribute('aria-pressed', String(sel.floor === n));
+    });
+  }
   let viewer = null;
   let current = { wing: null, floor: null, door: null };
 
@@ -85,20 +115,25 @@ function createUI(root, data) {
     const floor = sel.floor != null ? data.floors[sel.floor] : null;
     card.dataset.state = 'wing';
     card.style.setProperty('--swatch', w.color);
+    const wingSeg = `<span class="sign-seg is-wing" style="--swatch:${w.color};--plate-ink:${w.ink}"><b>${w.n}</b><em>Wing</em></span>`;
+    const sign = sel.floor != null
+      ? `${wingSeg}<span class="sign-seg"><b>${sel.floor}</b><em>Floor</em></span><span class="sign-seg"><b>${sel.door != null ? sel.door : '–'}</b><em>Door</em></span>`
+      : wingSeg;
+    const reading = [`Wing ${w.n}`, floor ? floor.en : null, sel.door != null ? `door ${sel.door}` : null].filter(Boolean).join(', ');
+    const facts = [
+      floor ? ['Floor', `${floor.en} · ${floor.de}`] : null,
+      ...ents.map((e) => ['Street entrance', e.label]),
+    ].filter(Boolean);
     card.innerHTML = `
-      <div class="b3d-card-head">
-        <span class="b3d-plate" style="--swatch:${w.color};--plate-ink:${w.ink}">${w.n}</span>
-        <div>
-          <h3 class="b3d-card-title">Wing ${w.n}${sel.door != null ? ` <span class="b3d-door">· door ${sel.door}</span>` : ''}</h3>
-          <p class="b3d-card-where">${w.where}</p>
-        </div>
-      </div>
-      ${floor ? `<p class="b3d-card-row"><span class="b3d-k">Floor</span><span class="b3d-v">${floor.en}${floor.de ? ` <span class="b3d-de">${floor.de}</span>` : ''}</span></p>` : ''}
-      ${ents.length ? `<p class="b3d-card-row"><span class="b3d-k">Entrance</span><span class="b3d-v">${ents.map((e) => e.label).join(', ')}</span></p>` : ''}
+      <div class="sign" aria-hidden="true">${sign}</div>
+      <h3 class="b3d-card-title">${reading}</h3>
+      <p class="b3d-card-where">${w.where}</p>
+      ${facts.length ? `<ul class="facts panel">${facts.map(([k, v]) => `<li><div class="fact"><span class="fact-k">${k}</span><span class="fact-v">${v}</span></div></li>`).join('')}</ul>` : ''}
       ${sel.floorNote ? `<p class="b3d-card-note">${sel.floorNote}</p>` : ''}
+      ${sel.floor == null ? `<p class="b3d-card-note">Pick a floor below the model to see where it is.</p>` : ''}
       <div class="b3d-card-actions">
-        <button type="button" class="b3d-btn b3d-share">${navigator.share ? 'Share this location' : 'Copy link to this location'}</button>
-        <button type="button" class="b3d-btn b3d-btn-quiet b3d-clear">Clear</button>
+        <button type="button" class="btn b3d-share">${navigator.share ? 'Share this location' : 'Copy link'}</button>
+        <button type="button" class="btn btn-quiet b3d-clear">Clear</button>
       </div>
       <p class="b3d-swatch-note"><span class="b3d-swatch" aria-hidden="true"></span>Wing colour: ${w.dye}</p>`;
     card.querySelector('.b3d-clear').addEventListener('click', () => select({ wing: null }, 'clear'));
@@ -128,6 +163,7 @@ function createUI(root, data) {
     current = { wing: sel.wing ?? null, floor: sel.wing != null ? sel.floor ?? null : null, door: sel.wing != null ? sel.door ?? null : null, floorNote: sel.floorNote };
     chipsBox.querySelectorAll('.b3d-chip').forEach((c) => c.setAttribute('aria-pressed', String(Number(c.dataset.wing) === current.wing)));
     renderCard(current);
+    renderStepper(current);
     if (source !== 'hash') {
       history.replaceState(null, '', current.wing == null ? location.pathname + location.search : `#${doorHash(current)}`);
     }
@@ -184,22 +220,23 @@ function createViewer(root, data, ui, reduceMotion) {
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(30, 1, 5, 3000);
+  const camera = new PerspectiveCamera(20, 1, 10, 4000); // narrow lens: close to an isometric model view
   const fonts = {
     label: getComputedStyle(root).getPropertyValue('--b3d-font-label').trim() || 'sans-serif',
     display: getComputedStyle(root).getPropertyValue('--b3d-font-display').trim() || 'serif',
   };
 
   // --- lights
-  const hemi = new HemisphereLight(0xe9eef2, 0xb8aa92, 1.6);
+  const hemi = new HemisphereLight(0xffffff, 0xdde2ea, 2.1);
   scene.add(hemi);
-  const sun = new DirectionalLight(0xfff2de, 2.4);
+  const sun = new DirectionalLight(0xffffff, 1.6);
   sun.position.set(-130, 210, 150);
   sun.castShadow = true;
   sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
   Object.assign(sun.shadow.camera, { left: -160, right: 160, top: 160, bottom: -160, near: 50, far: 600 });
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.6;
+  if ('intensity' in sun.shadow) sun.shadow.intensity = 0.55; // soft, light shadows
   scene.add(sun);
   scene.add(sun.target);
 
@@ -317,7 +354,7 @@ function createViewer(root, data, ui, reduceMotion) {
   const parts = []; // every mesh, with userData { wing, level }
   const pickables = [];
   const wingBoxes = new Map();
-  const floorPlate = 0xd9d4ca;
+  const floorPlate = 0xe9edf3;
 
   function addMesh(geometry, material, wing, level, opts = {}) {
     const mesh = new Mesh(geometry, hook(material));
@@ -360,8 +397,8 @@ function createViewer(root, data, ui, reduceMotion) {
       addMesh(caps(wx0, wx1, wz0, wz1, y0 + 0.02, y1 - 0.02), plainMat(floorPlate), m.wing, L, { cast: false });
       if (L === 3 && m.type === 'body') {
         const o = 0.35;
-        addMesh(caps(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xd8c9a8), m.wing, L, { cast: false });
-        addMesh(walls(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xd8c9a8), m.wing, L);
+        addMesh(caps(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xf4f0ec), m.wing, L, { cast: false });
+        addMesh(walls(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xf4f0ec), m.wing, L);
       }
       if (L === 4 && m.type === 'body') {
         addMesh(hipRoof(wx0 - 0.3, wx1 + 0.3, wz0 - 0.3, wz1 + 0.3, y1, Math.min(2.2, (Math.min(wx1 - wx0, wz1 - wz0)) * 0.12)), plainMat(0xffffff, { map: roofTex }), m.wing, 5);
@@ -371,11 +408,11 @@ function createViewer(root, data, ui, reduceMotion) {
       const top = m.type === 'pavilion' ? PAVILION_TOP : LINK_TOP;
       const parapet = new MeshStandardMaterial({ map: facade[`${finish}:upper`].map, roughness: 0.92, side: DoubleSide });
       addMesh(walls(x0, x1, z0, z1, top, top + 0.9), parapet, m.wing, 5);
-      addMesh(caps(x0 + 0.3, x1 - 0.3, z0 + 0.3, z1 - 0.3, top, top + 0.05), plainMat(0x5d6865), m.wing, 5, { cast: false });
+      addMesh(caps(x0 + 0.3, x1 - 0.3, z0 + 0.3, z1 - 0.3, top, top + 0.05), plainMat(0xd5dce6), m.wing, 5, { cast: false });
       if (m.type === 'pavilion' && (x1 - x0) > 12 && (z1 - z0) > 12) {
         const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
-        addMesh(walls(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xc9cdc9), m.wing, 5);
-        addMesh(caps(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xb9bfbb), m.wing, 5, { cast: false });
+        addMesh(walls(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xeef1f5), m.wing, 5);
+        addMesh(caps(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xdfe4eb), m.wing, 5, { cast: false });
       }
     }
   });
@@ -384,11 +421,18 @@ function createViewer(root, data, ui, reduceMotion) {
 
   // --- ground, trees
   let groundTex = null;
-  const ground = new Mesh(new PlaneGeometry(GROUND.x1 - GROUND.x0, GROUND.z1 - GROUND.z0), new MeshStandardMaterial({ roughness: 1, metalness: 0 }));
+  // matte (Lambert) ground: a physically based one goes dark at the shallow angles toward the horizon
+  const ground = new Mesh(new PlaneGeometry(GROUND.x1 - GROUND.x0, GROUND.z1 - GROUND.z0), new MeshLambertMaterial());
   ground.rotation.x = -Math.PI / 2;
   ground.position.set((GROUND.x0 + GROUND.x1) / 2, 0, (GROUND.z0 + GROUND.z1) / 2);
   ground.receiveShadow = true;
   scene.add(ground);
+  // a wide plane in the ground map's edge colour, so the map's border melts into the background
+  const baseGround = new Mesh(new PlaneGeometry(6000, 6000), new MeshLambertMaterial());
+  baseGround.rotation.x = -Math.PI / 2;
+  baseGround.position.y = -0.08;
+  baseGround.receiveShadow = true;
+  scene.add(baseGround);
 
   const treeSpots = [];
   for (let v = 300; v <= 780; v += 24) { treeSpots.push([90, v]); if (v < 320 || v > 672) treeSpots.push([119, v]); }
@@ -396,15 +440,15 @@ function createViewer(root, data, ui, reduceMotion) {
   for (let u = 130; u <= 490; u += 30) treeSpots.push([u, 300]);
   [[200, 400], [262, 455], [362, 404], [420, 460], [205, 560], [270, 590], [350, 548], [430, 600], [240, 520]].forEach((p) => treeSpots.push(p));
   for (let v = 120; v <= 900; v += 19) treeSpots.push([548 + ((v * 37) % 40), v]);
-  const canopyGeo = new IcosahedronGeometry(3.4, 0);
-  const trunkGeo = new CylinderGeometry(0.3, 0.4, 3, 5);
-  const canopy = new InstancedMesh(canopyGeo, new MeshStandardMaterial({ color: 0x8fae7d, roughness: 1, flatShading: true }), treeSpots.length);
-  const trunks = new InstancedMesh(trunkGeo, new MeshStandardMaterial({ color: 0x7a6a58, roughness: 1 }), treeSpots.length);
+  const canopyGeo = new IcosahedronGeometry(3.0, 2);
+  const trunkGeo = new CylinderGeometry(0.22, 0.3, 3.2, 6);
+  const canopy = new InstancedMesh(canopyGeo, new MeshStandardMaterial({ color: 0x9ccc8f, roughness: 0.9 }), treeSpots.length);
+  const trunks = new InstancedMesh(trunkGeo, new MeshStandardMaterial({ color: 0xc8b6a0, roughness: 1 }), treeSpots.length);
   const mtx = new Matrix4(), q = new Quaternion(), sc = new Vector3(), ps = new Vector3();
   treeSpots.forEach(([u, v], i) => {
     const [x, z] = toWorld(u, v);
     const s = 0.75 + ((u * 13 + v * 7) % 10) / 20;
-    mtx.compose(ps.set(x, 3.6 + 2.6 * s, z), q.identity(), sc.set(s, s * 1.15, s));
+    mtx.compose(ps.set(x, 3.4 + 2.6 * s, z), q.identity(), sc.set(s, s, s));
     canopy.setMatrixAt(i, mtx);
     mtx.compose(ps.set(x, 1.5, z), q.identity(), sc.set(1, 1, 1));
     trunks.setMatrixAt(i, mtx);
@@ -422,17 +466,18 @@ function createViewer(root, data, ui, reduceMotion) {
     const isDark = readTheme();
     if (isDark === dark) return;
     dark = isDark;
-    const bg = getComputedStyle(stage).getPropertyValue('--b3d-bg').trim() || (dark ? '#121716' : '#eef0eb');
+    const bg = getComputedStyle(stage).getPropertyValue('--b3d-bg').trim() || (dark ? '#0f131a' : '#eceff5');
     scene.background = new Color(bg);
-    scene.fog = new Fog(bg, 330, 720);
-    hemi.color.set(dark ? 0x40507a : 0xe9eef2);
-    hemi.groundColor.set(dark ? 0x101314 : 0xb8aa92);
-    hemi.intensity = dark ? 1.0 : 1.6;
-    sun.color.set(dark ? 0x9fb5dc : 0xfff2de);
-    sun.intensity = dark ? 0.9 : 2.4;
+    scene.fog = new Fog(bg, 700, 1500);
+    baseGround.material.color.set(dark ? '#0f131a' : '#eceff5');
+    hemi.color.set(dark ? 0x3d4e74 : 0xffffff);
+    hemi.groundColor.set(dark ? 0x0d1015 : 0xdde2ea);
+    hemi.intensity = dark ? 1.0 : 2.1;
+    sun.color.set(dark ? 0xa8bce0 : 0xffffff);
+    sun.intensity = dark ? 0.8 : 1.6;
     facadeMats.forEach((m) => { m.emissiveIntensity = dark ? 1.25 : 0; });
-    canopy.material.color.set(dark ? 0x2c3b2f : 0x8fae7d);
-    const clay = srgb(dark ? '#2a3231' : '#d3d7d1');
+    canopy.material.color.set(dark ? 0x2a3b2e : 0x9ccc8f);
+    const clay = srgb(dark ? '#1b222d' : '#e2e7ee');
     parts.forEach((p) => p.material.userData.uClay.value.copy(clay));
     if (groundTex) groundTex.dispose();
     groundTex = new CanvasTexture(groundCanvas(dark, fonts));
@@ -452,8 +497,8 @@ function createViewer(root, data, ui, reduceMotion) {
   controls.dampingFactor = 0.09;
   controls.enablePan = !small;
   controls.screenSpacePanning = false;
-  controls.minDistance = 45;
-  controls.maxDistance = 560;
+  controls.minDistance = 70;
+  controls.maxDistance = 900;
   controls.minPolarAngle = 0.05;
   controls.maxPolarAngle = 1.32;
   controls.rotateSpeed = 0.7;
@@ -489,7 +534,7 @@ function createViewer(root, data, ui, reduceMotion) {
     let polar = 1.0;
     if (sel.wing === 5) { dir = Math.atan2(-0.35, 1); polar = 0.86; }
     const yTarget = sel.floor != null ? FLOORS[Math.min(sel.floor, 4)].y + 2 : 6;
-    return { target: new Vector3(cx, yTarget, cz), dist: Math.max(135, fitDistance(radius) * 0.95), polar, azim: dir + 0.42 };
+    return { target: new Vector3(cx, yTarget, cz), dist: Math.max(200, fitDistance(radius) * 0.95), polar, azim: dir + 0.42 };
   }
   function placeFor(v) {
     const p = new Vector3(Math.sin(v.polar) * Math.sin(v.azim), Math.cos(v.polar), Math.sin(v.polar) * Math.cos(v.azim));
@@ -538,7 +583,7 @@ function createViewer(root, data, ui, reduceMotion) {
       dim: any && !mine ? (wing ? 0.62 : 0.7) : 0,
       lift: hasFloor && level > selection.floor ? LIFT : 0,
       fade: hasFloor && level > selection.floor ? 1 : 0,
-      tint: hasFloor && level === selection.floor ? 0.5 : mine && selection.floor == null ? 0.12 : 0,
+      tint: !mine ? 0 : hasFloor ? (level === selection.floor ? 0.62 : level < selection.floor ? 0.35 : 0) : 0.55,
     };
   }
   parts.forEach((p) => { p.userData.cur = { dim: 0, lift: 0, fade: 0, tint: 0 }; });
@@ -546,7 +591,9 @@ function createViewer(root, data, ui, reduceMotion) {
     const tint = selection.wing != null ? srgb(ui.wing(selection.wing).color) : null;
     const from = parts.map((p) => ({ ...p.userData.cur }));
     const to = parts.map((p) => targetsFor(p));
-    parts.forEach((p, i) => { if (tint && to[i].tint) p.material.userData.uTint.value.copy(tint); });
+    // the chosen floor gets the full wing colour, the rest of the wing a pastel of it
+    const pastel = tint ? tint.clone().lerp(new Vector3(1, 1, 1), 0.45) : null;
+    parts.forEach((p, i) => { if (tint && to[i].tint) p.material.userData.uTint.value.copy(to[i].tint >= 0.5 ? tint : pastel); });
     if (anim) tweens.delete(anim);
     anim = tween(700, (e) => {
       parts.forEach((p, i) => {
@@ -587,11 +634,11 @@ function createViewer(root, data, ui, reduceMotion) {
     const el = document.createElement('div');
     el.className = 'b3d-pin';
     el.dataset.id = e.id;
-    el.innerHTML = `<span class="b3d-pin-dot" aria-hidden="true"></span><span class="b3d-pin-label">${ui.entranceLabel(e.id)}</span>`;
+    el.innerHTML = `<svg class="b3d-pin-mark" viewBox="0 0 26 34" aria-hidden="true"><path d="M13 33C13 33 1.5 21.6 1.5 12.6a11.5 11.5 0 0 1 23 0C24.5 21.6 13 33 13 33z" fill="currentColor" stroke="#fff" stroke-width="2"/><path d="M9.2 18.2V7.8h7.6v10.4M7.6 18.2h10.8M14.2 13.2v.4" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="b3d-pin-label">${ui.entranceLabel(e.id)}</span>`;
     labelsBox.appendChild(el);
     const [x, z] = toWorld(e.at[0], e.at[1]);
     const out = { n: [0, -1.2], s: [0, 1.2], w: [-1.2, 0], e: [1.2, 0] }[e.face];
-    return { el, data: e, pos: new Vector3(x + out[0], 2.2, z + out[1]) };
+    return { el, data: e, pos: new Vector3(x + out[0] * 2, 4.5, z + out[1] * 2) };
   });
   // street names float above the ground and stay upright, turned along their street
   const streetLabels = STREETS.map((st) => {
@@ -631,7 +678,7 @@ function createViewer(root, data, ui, reduceMotion) {
     const x = (proj.x * 0.5 + 0.5) * size.x, y = (-proj.y * 0.5 + 0.5) * size.y;
     el.style.setProperty('--x', `${x.toFixed(1)}px`);
     el.style.setProperty('--y', `${y.toFixed(1)}px`);
-    el.classList.toggle('is-flipped', x > size.x - 170);
+    el.classList.toggle('is-flipped', x > size.x - 240); // keep labels clear of the zoom buttons
     let hidden = !visible;
     if (!hidden && hideBehind) {
       const dir = pos.clone().sub(camera.position);
@@ -663,10 +710,7 @@ function createViewer(root, data, ui, reduceMotion) {
       if (ang < -90) ang += 180;
       st.el.style.setProperty('--r', `${ang.toFixed(1)}deg`);
     });
-    if (selection.wing != null && selection.floor != null) {
-      place(floorTag, floorTagPos, false);
-      floorTag.hidden = false;
-    } else floorTag.hidden = true;
+    floorTag.hidden = true; // the floor stepper says which floor it is
     // compass: angle between "up the screen" on the ground and true north
     const az = controls.getAzimuthalAngle();
     const fwd = [-Math.sin(az), -Math.cos(az)];
@@ -710,6 +754,8 @@ function createViewer(root, data, ui, reduceMotion) {
     const moved = controls.update();
     if (animating || moved || dirty) {
       dirty = false;
+      const d = camera.position.distanceTo(controls.target); // fog follows the zoom so the horizon always fades out
+      if (scene.fog) { scene.fog.near = d * 0.95; scene.fog.far = d * 1.7; }
       renderer.render(scene, camera);
       updateLabels();
     }
@@ -759,8 +805,9 @@ function createViewer(root, data, ui, reduceMotion) {
         const hx = (b.x1 - b.x0) / 2, hz = (b.z1 - b.z0) / 2;
         const t = Math.min(hx / Math.max(Math.abs(dx), 1e-3), hz / Math.max(Math.abs(dz), 1e-3)) + 2;
         floorTagPos.set((b.x0 + b.x1) / 2 + dx * t, f.y + f.h / 2, (b.z0 + b.z1) / 2 + dz * t);
-        floorTag.textContent = ui.floorName(selection.floor);
+        floorTag.innerHTML = `<b>${selection.floor}</b>${ui.floorName(selection.floor)}`;
         floorTag.style.setProperty('--swatch', ui.wing(selection.wing).color);
+        floorTag.style.setProperty('--plate-ink', ui.wing(selection.wing).ink);
       }
       applySelection();
       if (!introDone) { pending = selection.wing != null ? selection : null; return; }

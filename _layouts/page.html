@@ -7,7 +7,7 @@ layout: default
   {%- if page.toc %}
   <nav class="toc" data-toc hidden aria-label="On this page"><p class="toc-label">On this page</p></nav>
   {%- endif %}
-  <article class="prose">
+  <article class="prose"{% if page.accordion %} data-accordion{% endif %}{% if page.places %} data-places{% endif %}>
 {{ content }}
   </article>
 </main>

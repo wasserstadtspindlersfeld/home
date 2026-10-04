@@ -27,7 +27,9 @@ defaults:
   - scope: { path: "maps/maps.md" }
     values: { layout: map }
   - scope: { path: "faq/faq.md" }
-    values: { toc: true }
+    values: { accordion: true }
+  - scope: { path: "locations/locations.md" }
+    values: { places: true }
   - scope: { path: "smart_home/smart_home_ideas.md" }
     values: { toc: true }
 

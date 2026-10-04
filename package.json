@@ -1,0 +1,14 @@
+{
+  "name": "wasserstadt-spindlersfeld-site",
+  "private": true,
+  "description": "Builds the site's JavaScript. The built files in assets/js are committed, so GitHub Pages needs no build step.",
+  "scripts": {
+    "build": "npm run build:3d && npm run build:site",
+    "build:3d": "esbuild _src/building-3d/main.js --bundle --minify --format=esm --target=es2020,safari15,chrome90,firefox90 --legal-comments=eof --outfile=assets/js/building-3d.js",
+    "build:site": "esbuild _src/site/site.js --bundle --minify --format=iife --target=es2020,safari15,chrome90,firefox90 --outfile=assets/js/site.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.11",
+    "three": "0.186.1"
+  }
+}

@@ -1,14 +1,21 @@
 {
-  "name": "Wasserstadt Spindlersfeld Website",
-  "short_name": "WS website",
+  "name": "Wasserstadt Spindlersfeld",
+  "short_name": "Spindlersfeld",
+  "start_url": "../",
+  "scope": "../",
   "icons": [
     {
-      "src": "https://wasserstadtspindlersfeld.github.io/home/resources/home_icon.png",
+      "src": "../assets/img/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "../assets/img/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff"
+  "theme_color": "#a5432c",
+  "background_color": "#eef0eb"
 }

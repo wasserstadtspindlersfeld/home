@@ -1,0 +1,8 @@
+<header class="page-head">
+  {%- assign kicker = page.kicker | default: include.section.kicker -%}
+  {%- assign icon = page.icon | default: include.section.icon -%}
+  {%- if kicker %}
+  <p class="eyebrow">{% if icon %}{% include icon.html name=icon %}{% endif %}{{ kicker }}</p>
+  {%- endif %}
+  <h1 class="page-title">{{ page.title }}</h1>
+</header>

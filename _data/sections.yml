@@ -1,0 +1,39 @@
+# The sections shown in the menu and on the home page, in menu order.
+# title: menu name, url: page address, icon: name from _includes/icon.html,
+# kicker: small label above the page title, blurb: one line for the home page.
+- title: FAQ
+  url: /faq/faq.html
+  icon: faq
+  kicker: Questions and answers
+  blurb: Painting, garbage days, heating, moving big things
+- title: Contacts
+  url: /contacts/contacts.html
+  icon: phone
+  kicker: Who to call
+  blurb: Bock Hausservice, Hilpert Hausverwaltung, ROMI
+- title: Nearby
+  url: /locations/locations.html
+  icon: pin
+  kicker: Around the corner
+  blurb: Doctors, vets, printing, recycling
+- title: Heating costs
+  url: /heating-costs/heating-costs.html
+  icon: radiator
+  kicker: Your yearly bill
+  blurb: How heating and water are billed, plus a calculator
+- title: Maps
+  url: /maps/maps.html
+  icon: map
+  kicker: Finding your way
+  blurb: Find any wing, floor and entrance in 3D
+  featured: true
+- title: Manuals
+  url: /manuals/manuals.html
+  icon: book
+  kicker: Appliances
+  blurb: Washing machine, fridge, microwave, video phone, AC
+- title: Smart home
+  url: /smart_home/smart_home_ideas.html
+  icon: camera
+  kicker: Ideas
+  blurb: Camera and door sensor kits for your apartment

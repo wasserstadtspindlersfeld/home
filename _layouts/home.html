@@ -1,0 +1,89 @@
+---
+layout: default
+---
+{%- comment -%}
+  The home page content is readme.md. Two invisible markers in it tell this layout what to replace:
+  <!-- site:hide --> … <!-- /site:hide -->          the title and photo (drawn below as the hero)
+  <!-- site:sections --> … <!-- /site:sections -->  the table of contents (drawn below as tiles)
+  GitHub ignores the markers, so the README still reads normally there.
+{%- endcomment -%}
+{%- assign body = content -%}
+{%- if body contains '<!-- site:hide -->' -%}
+  {%- assign a = body | split: '<!-- site:hide -->' -%}
+  {%- assign b = a[1] | split: '<!-- /site:hide -->' -%}
+  {%- assign body = a[0] | append: b[1] -%}
+{%- endif -%}
+{%- assign intro = body -%}
+{%- assign rest = '' -%}
+{%- if body contains '<!-- site:sections -->' -%}
+  {%- assign a = body | split: '<!-- site:sections -->' -%}
+  {%- assign b = a[1] | split: '<!-- /site:sections -->' -%}
+  {%- assign intro = a[0] -%}
+  {%- assign rest = b[1] -%}
+{%- endif -%}
+{%- assign img = '/assets/img/' | relative_url -%}
+<main id="main" class="home">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-band">
+      <p class="eyebrow">Residents' guide · Köpenick</p>
+      <h1 class="hero-title" id="hero-title">Wasserstadt <span>Spindlersfeld</span></h1>
+    </div>
+    <figure class="hero-photo">
+      <img id="hero-img" src="{{ img }}hero-spring-1200.webp" srcset="{{ img }}hero-spring-800.webp 800w, {{ img }}hero-spring-1200.webp 1200w, {{ img }}hero-spring-1536.webp 1536w" sizes="(min-width: 1100px) 1040px, calc(100vw - 32px)" width="1536" height="1024" fetchpriority="high" alt="The Ringbau from above in spring, with the Spree behind it">
+      <script>
+        (function () {
+          var d = new Date(), m = d.getMonth();
+          if (m === 11 || (m === 0 && d.getDate() <= 6)) {
+            var i = document.getElementById('hero-img');
+            i.srcset = '{{ img }}hero-winter-800.webp 800w, {{ img }}hero-winter-1200.webp 1200w, {{ img }}hero-winter-1536.webp 1536w';
+            i.src = '{{ img }}hero-winter-1200.webp';
+            i.alt = 'The Ringbau from above, dressed up for Christmas';
+          }
+        })();
+      </script>
+    </figure>
+  </section>
+
+  <div class="home-body">
+    <div class="prose home-intro">
+{{ intro }}
+    </div>
+
+    <form class="door-finder" action="{{ '/maps/maps.html' | relative_url }}" autocomplete="off">
+      <label class="finder-label" for="home-door">{% include icon.html name="door" %}Find a door</label>
+      <div class="finder-row">
+        <input id="home-door" name="door" inputmode="decimal" enterkeyhint="go" placeholder="1.2.3" aria-describedby="home-door-help">
+        <button type="submit" class="btn">Show on map {% include icon.html name="arrow" %}</button>
+      </div>
+      <p class="finder-help" id="home-door-help">Door numbers are <b>wing.floor.door</b>, so 1.2.3 is wing 1, 2nd floor, door 3.</p>
+    </form>
+
+    <nav class="tiles" aria-label="Sections">
+      {%- for s in site.data.sections %}{% if s.featured %}
+      <a class="tile-featured" href="{{ s.url | relative_url }}">
+        <img class="tile-image" src="{{ img }}map-preview.webp" width="1200" height="760" alt="The 3D model of the building, seen from Adolf-Heyden-Straße" loading="lazy">
+        <span class="tile">
+          <span class="tile-icon">{% include icon.html name=s.icon %}</span>
+          <span class="tile-text"><span class="tile-title">{{ s.title }}</span><span class="tile-blurb">{{ s.blurb }}</span></span>
+          {% include icon.html name="chevron" %}
+        </span>
+      </a>
+      {%- endif %}{% endfor %}
+      <ul class="tile-list">
+        {%- for s in site.data.sections %}{% unless s.featured %}
+        <li>
+          <a class="tile" href="{{ s.url | relative_url }}">
+            <span class="tile-icon">{% include icon.html name=s.icon %}</span>
+            <span class="tile-text"><span class="tile-title">{{ s.title }}</span><span class="tile-blurb">{{ s.blurb }}</span></span>
+            {% include icon.html name="chevron" %}
+          </a>
+        </li>
+        {%- endunless %}{% endfor %}
+      </ul>
+    </nav>
+
+    <div class="prose home-rest">
+{{ rest }}
+    </div>
+  </div>
+</main>

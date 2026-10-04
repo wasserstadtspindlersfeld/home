@@ -34,11 +34,13 @@ var app = new Vue( {
       // Inputs
       const year = this.input.Year;
       const tariff = this.input.Tariff;
-      const livingArea = parseFloat(this.input.LivingArea);
-      const heatingArea = parseFloat(this.input.HeatingArea);
-      const heatingUnits = parseFloat(this.input.HeatingUnits);
-      const warmWater = parseFloat(this.input.WarmWater);
-      const coldWater = parseFloat(this.input.ColdWater);
+      // Accept German decimal commas too ("62,5")
+      const toNumber = (value) => parseFloat(String(value).replace(',', '.'));
+      const livingArea = toNumber(this.input.LivingArea);
+      const heatingArea = toNumber(this.input.HeatingArea);
+      const heatingUnits = toNumber(this.input.HeatingUnits);
+      const warmWater = toNumber(this.input.WarmWater);
+      const coldWater = toNumber(this.input.ColdWater);
 
       let pricePerUnit = undefined;
       if (tariff === 'Average tariff') {

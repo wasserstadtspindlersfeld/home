@@ -1,6 +1,8 @@
+<!-- site:hide -->
 # Wasserstadt Spindlersfeld
 
 ![Building](locations/resources/building_spring.png)
+<!-- /site:hide -->
 
 ## Welcome
 
@@ -8,6 +10,7 @@ Hello everyone,
 
 This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
+<!-- site:sections -->
 Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
@@ -16,6 +19,8 @@ Table of contents
 - [Maps](./maps/maps.md)
 - [User manuals](./manuals/manuals.md)
 - [Smart Home Solutions](./smart_home/smart_home_ideas.md)
+
+<!-- /site:sections -->
 
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)

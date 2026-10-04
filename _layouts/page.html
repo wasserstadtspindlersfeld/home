@@ -1,0 +1,13 @@
+---
+layout: default
+---
+{%- assign section = site.data.sections | where: "url", page.url | first -%}
+<main id="main" class="page">
+  {% include page-head.html section=section %}
+  {%- if page.toc %}
+  <nav class="toc" data-toc hidden aria-label="On this page"><p class="toc-label">On this page</p></nav>
+  {%- endif %}
+  <article class="prose">
+{{ content }}
+  </article>
+</main>

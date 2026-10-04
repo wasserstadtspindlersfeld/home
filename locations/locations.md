@@ -12,7 +12,7 @@ Sections
 
 ### Praxisgemeinschaft Freiheit 1
 
-<img src="./resources/feriheit_1.png" alt="freiheit_1" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/feriheit_1.webp" alt="freiheit_1" width="100%"/>
 
 | | |
 |-|-|
@@ -20,12 +20,12 @@ Sections
 | Languages | German, English |
 | Appointment | Needed for some services, check the website |
 | Address | [Freiheit 1, 12555 Berlin](https://maps.app.goo.gl/mxc2d49xbpRB9Zpz5) |
-| Phone | [030 - 655 72 25](0306557225) |
+| Phone | [030 - 655 72 25](tel:0306557225) |
 | Website | [https://praxis-freiheit1.de](https://praxis-freiheit1.de) |
 
 ### Dr. Karsten Lange
 
-<img src="./resources/karsten_lange_entrance.png" alt="karsten_lange" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/karsten_lange_entrance.webp" alt="karsten_lange" width="100%"/>
 
 | | |
 |-|-|
@@ -34,14 +34,14 @@ Sections
 | Languages | German, English (secretary service is only available in German) |
 | Appointment | Not needed |
 | Address | [Rudower Ch 12B, 12489 Berlin](https://maps.app.goo.gl/wHjzwBcPSFx6VwMy8) |
-| Phone | [030 - 67 19 88 88](03067198888) |
+| Phone | [030 - 67 19 88 88](tel:03067198888) |
 | Website | [https://www.doctolib.de/allgemeiner-chirurg/berlin/karsten-lange-berlin?pid=practice-223319](https://www.doctolib.de/allgemeiner-chirurg/berlin/karsten-lange-berlin?pid=practice-223319) |
 
 ## Vets / animal clinic
 
 ### AniCura Berlin-Biesdorf GbmH
 
-<img src="./resources/tierkilnik_biesdorf.png" alt="tierklinik_biesdorf" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/tierkilnik_biesdorf.webp" alt="tierklinik_biesdorf" width="100%"/>
 
 | | |
 |-|-|
@@ -56,7 +56,7 @@ Sections
 
 Professional copy service, you can print hundreds of pages - colored or black and white.
 
-<img src="./resources/copy_magnusstr.png" alt="Repro Kopier" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/copy_magnusstr.webp" alt="Repro Kopier" width="100%"/>
 
 | | |
 |-|-|
@@ -70,7 +70,7 @@ Professional copy service, you can print hundreds of pages - colored or black an
 
 ### Recyclinghof Oberspreestraße
 
-<img src="./resources/bsr_recyclehof.png" alt="recyclehof" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/bsr_recyclehof.webp" alt="recyclehof" width="100%"/>
 
 A place to take the following kind of garbage:
 - Old batteries (rechargable as well)
@@ -93,7 +93,7 @@ Instead of throwing away the clothes and shoes that you do not want to use anymo
 
 This one is rather small, but it is super close.
 
-<img src="./resources/clothes_n_shoes_2.png" alt="container_2" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/clothes_n_shoes_2.webp" alt="container_2" width="100%"/>
 
 | | |
 |-|-|
@@ -103,7 +103,7 @@ This one is rather small, but it is super close.
 
 This one has more containers, but it is a bit farther away.
 
-<img src="./resources/clothes_n_shoes.png" alt="container" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/clothes_n_shoes.webp" alt="container" width="100%"/>
 
 | | |
 |-|-|

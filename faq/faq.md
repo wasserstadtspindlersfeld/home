@@ -36,7 +36,7 @@ Good to know:
 - The heating system is slow, if you change the controller settings it will take a while (could be day) to see the impact
 - If you want to save money, set it to a comfortable level and do not change it regularly - only if you leave the apartment for a longer period
 - Level 3 on the controller means ~22° Celsius
-- If you have problems with the heating system, contact [Bock Hausverwaltung](../contacts/contacts.md#bock-hausverwaltung)
+- If you have problems with the heating system, contact [Bock Hausverwaltung](../contacts/contacts.md#bock-hausservice)
 
 Here is a video tutorial created by one of the WhatsApp group members.
 

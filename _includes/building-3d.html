@@ -46,6 +46,16 @@
 
   <div class="b3d-wings" role="group" aria-label="Wings"></div>
   <p class="b3d-legend">Wing colours match the printed maps. Each one is named after a dye, a nod to the old Spindler dye works.</p>
+  {%- assign rooms = site.data.building.laundry %}
+  {%- if rooms.size > 0 %}
+  <div class="b3d-places" role="group" aria-labelledby="b3d-laundry-label">
+    <p class="b3d-places-label" id="b3d-laundry-label">Laundry rooms</p>
+    {%- for l in rooms %}
+    {%- assign e = site.data.building.entrances | where: "id", l.entrance | first %}
+    <button type="button" class="b3d-place" data-laundry="{{ l.entrance }}" aria-pressed="false"><span class="b3d-place-icon">{% include icon.html name="washer" weight=2 %}</span><span class="b3d-place-text"><span class="b3d-place-title">{{ e.label }}</span><span class="b3d-place-sub">{{ l.washers }} washers · {{ l.dryers }} dryers{% if l.vending.size > 0 %} · {{ l.vending | join: ", " | downcase }}{% endif %}</span></span></button>
+    {%- endfor %}
+  </div>
+  {%- endif %}
 
   <script type="application/json" id="b3d-data">{{ site.data.building | jsonify }}</script>
   <noscript><p class="b3d-noscript">The 3D map needs JavaScript. The flat map is further down this page.</p></noscript>

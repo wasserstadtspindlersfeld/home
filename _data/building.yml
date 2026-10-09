@@ -30,3 +30,9 @@ entrances:
   - { id: ah3, label: "Adolf-Heyden-Str. 3 (garage)", wings: [] }
   - { id: ah5, label: "Adolf-Heyden-Str. 5", wings: [9] }
   - { id: hl14, label: "Henriette-Lustig-Str. 14", wings: [7, 8] }
+
+# Shared laundry rooms, each by the street entrance you go in by (an id from the list above).
+# They show on the 3D map as blue pins next to that entrance. vending = the vending machines.
+laundry:
+  - { entrance: ah1, washers: 5, dryers: 3, vending: [] }
+  - { entrance: ah5, washers: 3, dryers: 2, vending: ["Coffee and tea", "Snacks"], de: { vending: ["Kaffee und Tee", "Snacks"] } }

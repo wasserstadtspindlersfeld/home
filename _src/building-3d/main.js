@@ -14,6 +14,11 @@ import { buildModel, recolor, createMaterials, rayBox, PARTS, LEVELS } from './m
 import { buildGround, groundMaterial } from './ground.js';
 import { parseDoor, doorHash } from './door.js';
 
+// a washing machine, for the laundry rooms (declared before start(): a link straight to a
+// laundry room draws its card while the page is still starting up)
+const WASHER = '<rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M4.5 7.5h15"/><circle cx="12" cy="14" r="4.25"/><path d="M7.5 5.25h.01M10.5 5.25h.01"/>';
+const washerIcon = () => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WASHER}</svg>`;
+
 const root = document.getElementById('building-3d');
 if (root) start(root);
 
@@ -38,6 +43,7 @@ function start(root) {
 function createUI(root, data) {
   const wings = new Map(data.wings.map((w) => [w.n, w]));
   const entrances = new Map(data.entrances.map((e) => [e.id, e]));
+  const laundry = new Map((data.laundry || []).map((l) => [l.entrance, l])); // by entrance id
   const form = root.querySelector('.b3d-finder');
   const input = form.querySelector('input');
   const help = form.querySelector('.b3d-help');
@@ -76,7 +82,7 @@ function createUI(root, data) {
     });
   }
   let viewer = null;
-  let current = { wing: null, floor: null, door: null };
+  let current = { wing: null, floor: null, door: null, laundry: null };
 
   data.wings.forEach((w) => {
     const b = document.createElement('button');
@@ -90,6 +96,10 @@ function createUI(root, data) {
     b.addEventListener('click', () => select({ wing: current.wing === w.n && current.floor == null ? null : w.n, floor: null, door: null }, 'chip'));
     chipsBox.appendChild(b);
   });
+
+  // the laundry room buttons under the wing row (drawn by the page, so they read without JavaScript)
+  const places = [...root.querySelectorAll('.b3d-place')];
+  places.forEach((b) => b.addEventListener('click', () => select(current.laundry === b.dataset.laundry ? { wing: null } : { laundry: b.dataset.laundry }, 'chip')));
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -110,7 +120,29 @@ function createUI(root, data) {
 
   function ordinal(n) { return data.floors[n] ? data.floors[n].en : `Floor ${n}`; }
 
+  function renderLaundry(l) {
+    const where = entrances.get(l.entrance).label;
+    card.dataset.state = 'laundry';
+    const facts = [
+      ['Washing machines', l.washers],
+      ['Dryers', l.dryers],
+      ['Vending machines', l.vending && l.vending.length ? l.vending.join(' · ') : 'None'],
+    ];
+    card.innerHTML = `
+      <div class="sign" aria-hidden="true"><span class="sign-seg is-laundry"><b>${washerIcon()}</b><em>Laundry</em></span></div>
+      <h3 class="b3d-card-title">Laundry room</h3>
+      <p class="b3d-card-where">At ${where}</p>
+      <ul class="facts panel">${facts.map(([k, v]) => `<li><div class="fact"><span class="fact-k">${k}</span><span class="fact-v">${v}</span></div></li>`).join('')}</ul>
+      <div class="b3d-card-actions">
+        <button type="button" class="btn b3d-share">${navigator.share ? 'Share this location' : 'Copy link'}</button>
+        <button type="button" class="btn btn-quiet b3d-clear">Clear</button>
+      </div>`;
+    card.querySelector('.b3d-clear').addEventListener('click', () => select({ wing: null }, 'clear'));
+    card.querySelector('.b3d-share').addEventListener('click', share);
+  }
+
   function renderCard(sel) {
+    if (sel.laundry) { renderLaundry(laundry.get(sel.laundry)); return; }
     if (sel.wing == null) { card.innerHTML = emptyCard; card.dataset.state = 'empty'; return; }
     const w = wings.get(sel.wing);
     const ents = data.entrances.filter((e) => (e.wings || []).includes(sel.wing));
@@ -146,7 +178,8 @@ function createUI(root, data) {
     const btn = e.currentTarget;
     const url = location.href;
     const w = wings.get(current.wing);
-    const text = current.floor != null ? `Wing ${w.n}, ${ordinal(current.floor)}${current.door != null ? `, door ${current.door}` : ''}` : `Wing ${w.n}`;
+    const text = current.laundry ? `Laundry room at ${entrances.get(current.laundry).label}`
+      : current.floor != null ? `Wing ${w.n}, ${ordinal(current.floor)}${current.door != null ? `, door ${current.door}` : ''}` : `Wing ${w.n}`;
     if (navigator.share) {
       try { await navigator.share({ title: 'Wasserstadt Spindlersfeld', text, url }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
     }
@@ -162,12 +195,16 @@ function createUI(root, data) {
   }
 
   function select(sel, source) {
-    current = { wing: sel.wing ?? null, floor: sel.wing != null ? sel.floor ?? null : null, door: sel.wing != null ? sel.door ?? null : null, floorNote: sel.floorNote };
+    current = sel.laundry && laundry.has(sel.laundry)
+      ? { wing: null, floor: null, door: null, laundry: sel.laundry }
+      : { wing: sel.wing ?? null, floor: sel.wing != null ? sel.floor ?? null : null, door: sel.wing != null ? sel.door ?? null : null, floorNote: sel.floorNote, laundry: null };
     chipsBox.querySelectorAll('.b3d-chip').forEach((c) => c.setAttribute('aria-pressed', String(Number(c.dataset.wing) === current.wing)));
+    places.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.laundry === current.laundry)));
     renderCard(current);
     renderStepper(current);
     if (source !== 'hash') {
-      history.replaceState(null, '', current.wing == null ? location.pathname + location.search : `#${doorHash(current)}`);
+      const hash = current.laundry ? `#laundry-${current.laundry}` : current.wing != null ? `#${doorHash(current)}` : '';
+      history.replaceState(null, '', hash || location.pathname + location.search);
     }
     if (source === 'finder') input.value = current.wing == null ? '' : hashLabel(current);
     if (source === 'hash') input.value = current.floor != null ? hashLabel(current) : '';
@@ -190,6 +227,8 @@ function createUI(root, data) {
     readHash() {
       const h = decodeURIComponent(location.hash.slice(1));
       if (!h) return;
+      const room = /^laundry-([a-z0-9]+)$/i.exec(h);
+      if (room) { if (laundry.has(room[1])) select({ laundry: room[1] }, 'hash'); return; }
       const m = /^wing-(\d)$/.exec(h);
       const res = m ? { wing: Number(m[1]), floor: null, door: null } : parseDoor(h, data.floors.length - 1);
       if (!res.error && res.wing) select(res, 'hash');
@@ -391,7 +430,13 @@ function createViewer(root, data, ui, reduceMotion) {
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
     return radius / Math.sin(Math.min(vfov, hfov) / 2);
   }
+  const FACING = { n: Math.PI, s: 0, w: -Math.PI / 2, e: Math.PI / 2 }; // camera direction in front of a facade
   function viewFor(sel) {
+    const door = sel.laundry && ENTRANCES.find((e) => e.id === sel.laundry);
+    if (door) { // a laundry room: its entrance, seen from the street at an angle
+      const [x, z] = toWorld(door.at[0], door.at[1]);
+      return { target: new Vector3(x, 4, z), dist: 175, polar: 0.95, azim: FACING[door.face] + 0.5, shift: cardShift() };
+    }
     if (sel.wing == null) {
       return { target: new Vector3(0, 3, 4), dist: fitDistance(112) * 0.93, polar: 0.98, azim: -1.1 };
     }
@@ -457,7 +502,7 @@ function createViewer(root, data, ui, reduceMotion) {
 
   // --- selection state, animated per part (wing × storey) through the uPart uniform array
   const LIFT = 8;
-  let selection = { wing: null, floor: null };
+  let selection = { wing: null, floor: null, laundry: null };
   let anim = null;
   const state = Array.from({ length: PARTS }, () => ({ lift: 0, fade: 0, tint: 0, dim: 0, pastel: false }));
   function targetFor(i) {
@@ -534,15 +579,32 @@ function createViewer(root, data, ui, reduceMotion) {
     const box = wingBoxes.get(w.n);
     badges.set(w.n, { el: b, pos: new Vector3((box.x0 + box.x1) / 2, w.n === 5 ? 26 : 25, (box.z0 + box.z1) / 2), at: { hidden: true } });
   });
+  const pinMark = (glyph) => `<svg class="b3d-pin-mark" viewBox="0 0 26 34" aria-hidden="true"><path d="M13 33C13 33 1.5 21.6 1.5 12.6a11.5 11.5 0 0 1 23 0C24.5 21.6 13 33 13 33z" fill="currentColor" stroke="#fff" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${glyph}</g></svg>`;
   const pins = ENTRANCES.map((e) => {
     const el = document.createElement('div');
     el.className = 'b3d-pin';
     el.dataset.id = e.id;
-    el.innerHTML = `<svg class="b3d-pin-mark" viewBox="0 0 26 34" aria-hidden="true"><path d="M13 33C13 33 1.5 21.6 1.5 12.6a11.5 11.5 0 0 1 23 0C24.5 21.6 13 33 13 33z" fill="currentColor" stroke="#fff" stroke-width="2"/><path d="M9.2 18.2V7.8h7.6v10.4M7.6 18.2h10.8M14.2 13.2v.4" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="b3d-pin-label">${ui.entranceLabel(e.id)}</span>`;
+    el.innerHTML = `${pinMark('<path d="M9.2 18.2V7.8h7.6v10.4M7.6 18.2h10.8M14.2 13.2v.4"/>')}<span class="b3d-pin-label">${ui.entranceLabel(e.id)}</span>`;
     labelsBox.appendChild(el);
     const [x, z] = toWorld(e.at[0], e.at[1]);
     const out = { n: [0, -1.2], s: [0, 1.2], w: [-1.2, 0], e: [1.2, 0] }[e.face];
     return { el, label: el.querySelector('.b3d-pin-label'), data: e, pos: new Vector3(x + out[0] * 2, 4.5, z + out[1] * 2) };
+  });
+  // laundry rooms: a blue pin drawn just right of the entrance you go in by; a tap shows the room.
+  // It shares the entrance's spot in 3D and sits PAIR px over on screen, so the two never overlap.
+  const PAIR = 24;
+  (data.laundry || []).forEach((l) => {
+    const door = pins.find((p) => p.data.id === l.entrance);
+    if (!door) return;
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'b3d-pin is-laundry';
+    el.setAttribute('aria-label', `Laundry room at ${ui.entranceLabel(l.entrance)}`);
+    el.setAttribute('aria-pressed', 'false');
+    el.innerHTML = `<span class="b3d-pin-hit">${pinMark('<rect x="8.3" y="6.4" width="9.4" height="11.2" rx="1.6"/><path d="M8.3 9.2h9.4"/><circle cx="13" cy="13.5" r="2.5"/>')}</span><span class="b3d-pin-label">Laundry room</span>`;
+    el.addEventListener('click', () => ui.select(selection.laundry === l.entrance ? { wing: null } : { laundry: l.entrance }, 'tap'));
+    labelsBox.appendChild(el);
+    pins.push({ el, label: el.querySelector('.b3d-pin-label'), data: door.data, laundry: l.entrance, pos: door.pos, dx: PAIR, on: false });
   });
   // street names float above the ground and stay upright, turned along their street.
   // Each name has a few spots along its street, nearest to its usual place first.
@@ -586,7 +648,8 @@ function createViewer(root, data, ui, reduceMotion) {
   function place(el, pos, hideBehind) {
     proj.copy(pos).project(camera);
     const x = (proj.x * 0.5 + 0.5) * size.x, y = (-proj.y * 0.5 + 0.5) * size.y;
-    const hidden = !(proj.z > -1 && proj.z < 1) || (hideBehind && behind(pos));
+    const off = x < -30 || y < -40 || x > size.x + 30 || y > size.y + 40; // well outside the stage
+    const hidden = !(proj.z > -1 && proj.z < 1) || off || (hideBehind && behind(pos));
     el.style.setProperty('--x', `${x.toFixed(1)}px`);
     el.style.setProperty('--y', `${y.toFixed(1)}px`);
     el.classList.toggle('is-hidden', hidden);
@@ -684,8 +747,14 @@ function createViewer(root, data, ui, reduceMotion) {
       b.el.classList.toggle('is-muted', selection.wing != null && selection.wing !== n);
     });
     const at = pins.map((p) => {
-      p.el.classList.toggle('is-active', selection.wing != null && p.data.wings.includes(selection.wing));
-      return place(p.el, p.pos, true);
+      // an entrance shows its address when its wing is picked, or its laundry room
+      const on = p.laundry ? selection.laundry === p.laundry
+        : (selection.wing != null && p.data.wings.includes(selection.wing)) || selection.laundry === p.data.id;
+      p.el.classList.toggle('is-active', on);
+      if (p.laundry && p.on !== on) { p.on = on; p.el.setAttribute('aria-pressed', String(on)); }
+      const a = place(p.el, p.pos, true);
+      if (p.dx) a.x += p.dx;
+      return a;
     });
     const taken = blockers();
     const marks = at.map((a) => (a.hidden ? null : screenBox(a.x, a.y - 17, 15, 19)));
@@ -800,11 +869,12 @@ function createViewer(root, data, ui, reduceMotion) {
 
   return {
     select(sel, source) {
-      selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null };
+      selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null, laundry: sel.laundry || null };
       overlayBoxes = null; // the floor stepper and the card may have changed size
       applySelection();
-      if (!introDone) { pending = selection.wing != null ? selection : null; return; }
-      if (source === 'tap' && selection.wing != null) { requestRender(); return; } // keep the camera where the user put it
+      const picked = selection.wing != null || selection.laundry != null;
+      if (!introDone) { pending = picked ? selection : null; return; }
+      if (source === 'tap' && picked) { requestRender(); return; } // keep the camera where the user put it
       flyTo(viewFor(selection));
     },
     render: requestRender,

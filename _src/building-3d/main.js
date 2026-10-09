@@ -2,14 +2,16 @@
 // and the model shows the wing and lifts the storeys above that floor.
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Color, Fog, HemisphereLight, DirectionalLight,
-  Group, Mesh, BufferGeometry, Float32BufferAttribute, MeshStandardMaterial, MeshLambertMaterial, CanvasTexture,
-  RepeatWrapping, ClampToEdgeWrapping, SRGBColorSpace, PlaneGeometry, Vector3, Vector2, Raycaster,
-  InstancedMesh, IcosahedronGeometry, CylinderGeometry, Matrix4, Quaternion, PCFSoftShadowMap,
-  NeutralToneMapping, DoubleSide, TOUCH, MOUSE,
+  Mesh, BufferGeometry, MeshLambertMaterial, MeshBasicMaterial, CanvasTexture, DataArrayTexture,
+  RepeatWrapping, ClampToEdgeWrapping, LinearFilter, LinearMipmapLinearFilter, SRGBColorSpace, PlaneGeometry,
+  Vector3, Vector2, Raycaster, InstancedMesh, IcosahedronGeometry, CylinderGeometry, Matrix4, Quaternion,
+  PCFShadowMap, NeutralToneMapping, TOUCH, MOUSE,
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { MASSES, FLOORS, ENTRANCES, NORTH, PAVILION_TOP, LINK_TOP, STREETS, RIVER_BANK, toWorld } from './geometry.js';
-import { facadeCanvas, groundCanvas, roofCanvas, BAYS, BAY_WIDTH, GROUND } from './textures.js';
+import { FLOORS, ENTRANCES, NORTH, STREETS, RIVER_BANK, toWorld } from './geometry.js';
+import { facadeLayers, roofCanvas, FACADE_LAYERS } from './textures.js';
+import { buildModel, recolor, createMaterials, rayBox, PARTS, LEVELS } from './model.js';
+import { buildGround, groundMaterial } from './ground.js';
 import { parseDoor, doorHash } from './door.js';
 
 const root = document.getElementById('building-3d');
@@ -209,228 +211,81 @@ function createViewer(root, data, ui, reduceMotion) {
   const labelsBox = stage.querySelector('.b3d-labels');
   const compass = stage.querySelector('.b3d-compass-needle');
   const small = Math.min(window.innerWidth, window.innerHeight) < 700;
+  // a CSS colour as 0-1 sRGB components, for the shader colour uniforms
+  const srgb = (css) => { const o = {}; new Color(css).getRGB(o, SRGBColorSpace); return new Vector3(o.r, o.g, o.b); };
 
   const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap;
   renderer.shadowMap.autoUpdate = false;
   renderer.toneMapping = NeutralToneMapping;
-  const maxAniso = renderer.capabilities.getMaxAnisotropy();
+  const maxAniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(20, 1, 10, 4000); // narrow lens: close to an isometric model view
-  const fonts = {
-    label: getComputedStyle(root).getPropertyValue('--b3d-font-label').trim() || 'sans-serif',
-    display: getComputedStyle(root).getPropertyValue('--b3d-font-display').trim() || 'serif',
-  };
 
-  // --- lights
-  const hemi = new HemisphereLight(0xffffff, 0xdde2ea, 2.1);
+  // --- lights: warm daylight from the south-west
+  const hemi = new HemisphereLight(0xffffff, 0xe9dfd2, 2.0);
   scene.add(hemi);
-  const sun = new DirectionalLight(0xffffff, 1.6);
+  const sun = new DirectionalLight(0xfff3e4, 1.7);
   sun.position.set(-130, 210, 150);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
+  sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -160, right: 160, top: 160, bottom: -160, near: 50, far: 600 });
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.6;
-  if ('intensity' in sun.shadow) sun.shadow.intensity = 0.55; // soft, light shadows
+  sun.shadow.radius = 3; // soften the shadow edges
+  if ('intensity' in sun.shadow) sun.shadow.intensity = 0.5; // soft, light shadows
   scene.add(sun);
   scene.add(sun.target);
 
-  // --- shared textures
-  const tex = (cnv, repeat = true) => {
-    const t = new CanvasTexture(cnv);
+  // --- textures: every facade strip in one texture array, drawn larger on big screens
+  const arrayTexture = ({ data: pixels, width, height, depth }) => {
+    const t = new DataArrayTexture(pixels, width, height, depth);
     t.colorSpace = SRGBColorSpace;
-    t.wrapS = repeat ? RepeatWrapping : ClampToEdgeWrapping;
+    t.wrapS = RepeatWrapping;
     t.wrapT = ClampToEdgeWrapping;
+    t.minFilter = LinearMipmapLinearFilter;
+    t.magFilter = LinearFilter;
+    t.generateMipmaps = true;
     t.anisotropy = maxAniso;
+    t.needsUpdate = true;
     return t;
   };
-  const kinds = ['ground', 'upper', 'cornice', 'top', 'attic'];
-  const facade = {};
-  ['brick', 'plaster'].forEach((finish) => kinds.forEach((kind, i) => {
-    facade[`${finish}:${kind}`] = { map: tex(facadeCanvas(kind, finish, false, i + 1)), glow: tex(facadeCanvas(kind, finish, true, i + 1)) };
-  }));
-  const roofTex = tex(roofCanvas(false));
-  roofTex.wrapT = RepeatWrapping;
+  const facadeScale = small ? 1 : 2;
+  const facadeTex = arrayTexture(facadeLayers(false, facadeScale));
+  let glowTex = null; // the lit windows are drawn the first time the page goes dark
+  const noGlow = arrayTexture({ data: new Uint8Array(4 * FACADE_LAYERS.length), width: 1, height: 1, depth: FACADE_LAYERS.length });
+  const roofTex = new CanvasTexture(roofCanvas(false));
+  roofTex.colorSpace = SRGBColorSpace;
+  roofTex.wrapS = roofTex.wrapT = RepeatWrapping;
+  roofTex.anisotropy = maxAniso;
 
-  // --- material hook: ghost (uDim) and tint (uTint) mixed in after lighting, no transparency needed
-  function hook(material) {
-    material.userData.uDim = { value: 0 };
-    material.userData.uTintAmt = { value: 0 };
-    material.userData.uTint = { value: new Vector3(1, 1, 1) };
-    material.userData.uClay = { value: new Vector3(0.82, 0.84, 0.81) };
-    material.onBeforeCompile = (shader) => {
-      shader.uniforms.uDim = material.userData.uDim;
-      shader.uniforms.uTintAmt = material.userData.uTintAmt;
-      shader.uniforms.uTint = material.userData.uTint;
-      shader.uniforms.uClay = material.userData.uClay;
-      shader.fragmentShader = shader.fragmentShader
-        .replace('void main() {', 'uniform float uDim; uniform float uTintAmt; uniform vec3 uTint; uniform vec3 uClay;\nvoid main() {')
-        .replace('#include <dithering_fragment>', '#include <dithering_fragment>\n gl_FragColor.rgb = mix(gl_FragColor.rgb, uTint * (0.55 + 0.45 * dot(gl_FragColor.rgb, vec3(0.333))), uTintAmt);\n gl_FragColor.rgb = mix(gl_FragColor.rgb, uClay, uDim);');
-    };
-    material.customProgramCacheKey = () => 'b3d-hook';
-    return material;
-  }
-
-  const srgb = (hex) => { const c = parseInt(hex.slice(1), 16); return new Vector3(((c >> 16) & 255) / 255, ((c >> 8) & 255) / 255, (c & 255) / 255); };
-
-  // --- geometry helpers
-  function pushQuad(arr, a, b, c, d, uvA, uvB, uvC, uvD) {
-    arr.pos.push(...a, ...b, ...c, ...a, ...c, ...d);
-    arr.uv.push(...uvA, ...uvB, ...uvC, ...uvA, ...uvC, ...uvD);
-  }
-  function makeGeometry(arr) {
-    const g = new BufferGeometry();
-    g.setAttribute('position', new Float32BufferAttribute(arr.pos, 3));
-    g.setAttribute('uv', new Float32BufferAttribute(arr.uv, 2));
-    g.computeVertexNormals();
-    return g;
-  }
-  const strip = BAYS * BAY_WIDTH;
-  function walls(x0, x1, z0, z1, y0, y1) {
-    const a = { pos: [], uv: [] };
-    const U = (t) => t / strip;
-    pushQuad(a, [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1], [U(x0), 0], [U(x1), 0], [U(x1), 1], [U(x0), 1]);
-    pushQuad(a, [x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0], [U(x1), 0], [U(x0), 0], [U(x0), 1], [U(x1), 1]);
-    pushQuad(a, [x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0], [U(z0), 0], [U(z1), 0], [U(z1), 1], [U(z0), 1]);
-    pushQuad(a, [x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [U(z1), 0], [U(z0), 0], [U(z0), 1], [U(z1), 1]);
-    return makeGeometry(a);
-  }
-  function caps(x0, x1, z0, z1, y0, y1) {
-    const a = { pos: [], uv: [] };
-    const s = 1 / 8;
-    pushQuad(a, [x0, y1, z1], [x1, y1, z1], [x1, y1, z0], [x0, y1, z0], [x0 * s, z1 * s], [x1 * s, z1 * s], [x1 * s, z0 * s], [x0 * s, z0 * s]);
-    pushQuad(a, [x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], [0, 0], [1, 0], [1, 1], [0, 1]);
-    return makeGeometry(a);
-  }
-  function hipRoof(x0, x1, z0, z1, b, h) {
-    const a = { pos: [], uv: [] };
-    const s = 1 / 8;
-    const uv = (p) => [p[0] * s, p[2] * s];
-    const quad = (p, q, r2, t) => pushQuad(a, p, q, r2, t, uv(p), uv(q), uv(r2), uv(t));
-    const tri = (p, q, r2) => { a.pos.push(...p, ...q, ...r2); a.uv.push(...uv(p), ...uv(q), ...uv(r2)); };
-    const lx = x1 - x0, lz = z1 - z0, xc = (x0 + x1) / 2, zc = (z0 + z1) / 2;
-    if (lx >= lz) {
-      const hh = lz / 2;
-      const r1 = [x0 + hh, b + h, zc], r2 = [x1 - hh, b + h, zc];
-      quad([x0, b, z1], [x1, b, z1], r2, r1);
-      quad([x1, b, z0], [x0, b, z0], r1, r2);
-      tri([x0, b, z0], [x0, b, z1], r1);
-      tri([x1, b, z1], [x1, b, z0], r2);
-    } else {
-      const hh = lx / 2;
-      const r1 = [xc, b + h, z0 + hh], r2 = [xc, b + h, z1 - hh];
-      quad([x1, b, z1], [x1, b, z0], r1, r2);
-      quad([x0, b, z0], [x0, b, z1], r2, r1);
-      tri([x0, b, z1], [x1, b, z1], r2);
-      tri([x1, b, z0], [x0, b, z0], r1);
-    }
-    return makeGeometry(a);
-  }
-
-  // which sides of a mass touch another mass (no attic setback there)
-  function sharedSides(m) {
-    const [u0, u1, v0, v1] = m.r;
-    const touch = { n: 0, s: 0, w: 0, e: 0 };
-    const overlap = (a0, a1, b0, b1) => Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
-    MASSES.forEach((o) => {
-      if (o === m) return;
-      const [p0, p1, q0, q1] = o.r;
-      if (Math.abs(q1 - v0) < 0.8) touch.n += overlap(u0, u1, p0, p1);
-      if (Math.abs(q0 - v1) < 0.8) touch.s += overlap(u0, u1, p0, p1);
-      if (Math.abs(p1 - u0) < 0.8) touch.w += overlap(v0, v1, q0, q1);
-      if (Math.abs(p0 - u1) < 0.8) touch.e += overlap(v0, v1, q0, q1);
-    });
-    return { n: touch.n > (u1 - u0) * 0.5, s: touch.s > (u1 - u0) * 0.5, w: touch.w > (v1 - v0) * 0.5, e: touch.e > (v1 - v0) * 0.5 };
-  }
-
-  // --- build the building
-  const building = new Group();
-  scene.add(building);
-  const parts = []; // every mesh, with userData { wing, level }
-  const pickables = [];
-  const wingBoxes = new Map();
-  const floorPlate = 0xe9edf3;
-
-  function addMesh(geometry, material, wing, level, opts = {}) {
-    const mesh = new Mesh(geometry, hook(material));
-    mesh.castShadow = opts.cast !== false;
-    mesh.receiveShadow = true;
-    mesh.userData = { wing, level, baseY: 0 };
-    building.add(mesh);
-    parts.push(mesh);
-    if (wing) pickables.push(mesh);
-    return mesh;
-  }
-  const facadeMat = (key) => new MeshStandardMaterial({ map: facade[key].map, emissiveMap: facade[key].glow, emissive: 0xffffff, emissiveIntensity: 0, roughness: 0.92, metalness: 0 });
-  const plainMat = (color, extra = {}) => new MeshStandardMaterial({ color, roughness: 0.95, metalness: 0, ...extra });
-
-  MASSES.forEach((m) => {
-    const [a, b] = toWorld(m.r[0], m.r[2]);
-    const [c, d] = toWorld(m.r[1], m.r[3]);
-    const x0 = a, z0 = b, x1 = c, z1 = d;
-    const finish = m.finish || 'brick';
-    const shared = sharedSides(m);
-    const box = wingBoxes.get(m.wing) || { x0: Infinity, x1: -Infinity, z0: Infinity, z1: -Infinity };
-    wingBoxes.set(m.wing, { x0: Math.min(box.x0, x0), x1: Math.max(box.x1, x1), z0: Math.min(box.z0, z0), z1: Math.max(box.z1, z1) });
-
-    const storeys = m.type === 'link' ? 4 : 5;
-    for (let L = 0; L < storeys; L++) {
-      const f = FLOORS[L];
-      let y0 = f.y, y1 = f.y + f.h;
-      let kind = L === 0 ? 'ground' : L === 3 ? 'cornice' : 'upper';
-      let [wx0, wx1, wz0, wz1] = [x0, x1, z0, z1];
-      if (L === 4) {
-        if (m.type === 'pavilion') { kind = 'top'; y1 = PAVILION_TOP; } else {
-          kind = 'attic';
-          const inset = 1.0;
-          if (!shared.w) wx0 += inset; if (!shared.e) wx1 -= inset;
-          if (!shared.n) wz0 += inset; if (!shared.s) wz1 -= inset;
-        }
-      }
-      const fin = kind === 'attic' ? 'brick' : finish;
-      addMesh(walls(wx0, wx1, wz0, wz1, y0, y1), facadeMat(`${fin}:${kind}`), m.wing, L);
-      addMesh(caps(wx0, wx1, wz0, wz1, y0 + 0.02, y1 - 0.02), plainMat(floorPlate), m.wing, L, { cast: false });
-      if (L === 3 && m.type === 'body') {
-        const o = 0.35;
-        addMesh(caps(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xf4f0ec), m.wing, L, { cast: false });
-        addMesh(walls(x0 - o, x1 + o, z0 - o, z1 + o, y1 - 0.45, y1), plainMat(0xf4f0ec), m.wing, L);
-      }
-      if (L === 4 && m.type === 'body') {
-        addMesh(hipRoof(wx0 - 0.3, wx1 + 0.3, wz0 - 0.3, wz1 + 0.3, y1, Math.min(2.2, (Math.min(wx1 - wx0, wz1 - wz0)) * 0.12)), plainMat(0xffffff, { map: roofTex }), m.wing, 5);
-      }
-    }
-    if (m.type !== 'body') {
-      const top = m.type === 'pavilion' ? PAVILION_TOP : LINK_TOP;
-      const parapet = new MeshStandardMaterial({ map: facade[`${finish}:upper`].map, roughness: 0.92, side: DoubleSide });
-      addMesh(walls(x0, x1, z0, z1, top, top + 0.9), parapet, m.wing, 5);
-      addMesh(caps(x0 + 0.3, x1 - 0.3, z0 + 0.3, z1 - 0.3, top, top + 0.05), plainMat(0xd5dce6), m.wing, 5, { cast: false });
-      if (m.type === 'pavilion' && (x1 - x0) > 12 && (z1 - z0) > 12) {
-        const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
-        addMesh(walls(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xeef1f5), m.wing, 5);
-        addMesh(caps(cx - 3, cx + 3, cz - 2.2, cz + 2.2, top, top + 2.8), plainMat(0xdfe4eb), m.wing, 5, { cast: false });
-      }
-    }
-  });
-  parts.forEach((p) => { p.userData.mat = p.material; });
-  const facadeMats = parts.filter((p) => p.material.emissiveMap).map((p) => p.material);
+  // --- the building: one merged mesh (see model.js), plus a see-through copy for lifted storeys
+  const model = buildModel();
+  const { boxes, wingBoxes } = model;
+  const mats = createMaterials({ facade: facadeTex, glow: noGlow, roof: roofTex });
+  data.wings.forEach((w) => mats.uniforms.uWingColor.value[w.n].copy(srgb(w.color)));
+  const building = new Mesh(model.geometry, mats.solid);
+  building.castShadow = true;
+  building.receiveShadow = true;
+  building.customDepthMaterial = mats.depth;
+  const ghost = new Mesh(model.geometry, mats.ghost);
+  ghost.receiveShadow = true;
+  ghost.visible = false;
+  building.frustumCulled = ghost.frustumCulled = false; // lifted storeys float outside the bounding sphere
+  scene.add(building, ghost);
 
   // --- ground, trees
-  let groundTex = null;
-  // matte (Lambert) ground: a physically based one goes dark at the shallow angles toward the horizon
-  const ground = new Mesh(new PlaneGeometry(GROUND.x1 - GROUND.x0, GROUND.z1 - GROUND.z0), new MeshLambertMaterial());
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.set((GROUND.x0 + GROUND.x1) / 2, 0, (GROUND.z0 + GROUND.z1) / 2);
+  const groundMat = groundMaterial();
+  const ground = new Mesh(new BufferGeometry(), groundMat.material);
   ground.receiveShadow = true;
   scene.add(ground);
-  // a wide plane in the ground map's edge colour, so the map's border melts into the background
-  const baseGround = new Mesh(new PlaneGeometry(6000, 6000), new MeshLambertMaterial());
+  // a wide plane in the page colour, so the ground's faded edge melts into the background
+  const baseGround = new Mesh(new PlaneGeometry(6000, 6000), new MeshBasicMaterial());
   baseGround.rotation.x = -Math.PI / 2;
   baseGround.position.y = -0.08;
-  baseGround.receiveShadow = true;
   scene.add(baseGround);
 
   const treeSpots = [];
@@ -439,11 +294,10 @@ function createViewer(root, data, ui, reduceMotion) {
   for (let u = 130; u <= 490; u += 30) treeSpots.push([u, 300]);
   [[200, 400], [262, 455], [362, 404], [420, 460], [205, 560], [270, 590], [350, 548], [430, 600], [240, 520]].forEach((p) => treeSpots.push(p));
   for (let v = 120; v <= 900; v += 19) treeSpots.push([548 + ((v * 37) % 40), v]);
-  const canopyGeo = new IcosahedronGeometry(3.0, 2);
-  const trunkGeo = new CylinderGeometry(0.22, 0.3, 3.2, 6);
-  const canopy = new InstancedMesh(canopyGeo, new MeshStandardMaterial({ color: 0x9ccc8f, roughness: 0.9 }), treeSpots.length);
-  const trunks = new InstancedMesh(trunkGeo, new MeshStandardMaterial({ color: 0xc8b6a0, roughness: 1 }), treeSpots.length);
+  const canopy = new InstancedMesh(new IcosahedronGeometry(3.0, 2), new MeshLambertMaterial(), treeSpots.length);
+  const trunks = new InstancedMesh(new CylinderGeometry(0.22, 0.3, 3.2, 6), new MeshLambertMaterial(), treeSpots.length);
   const mtx = new Matrix4(), q = new Quaternion(), sc = new Vector3(), ps = new Vector3();
+  const leaf = new Color();
   treeSpots.forEach(([u, v], i) => {
     const [x, z] = toWorld(u, v);
     const s = 0.75 + ((u * 13 + v * 7) % 10) / 20;
@@ -451,11 +305,16 @@ function createViewer(root, data, ui, reduceMotion) {
     canopy.setMatrixAt(i, mtx);
     mtx.compose(ps.set(x, 1.5, z), q.identity(), sc.set(1, 1, 1));
     trunks.setMatrixAt(i, mtx);
+    canopy.setColorAt(i, leaf.setHSL(0.26 + ((u + v) % 7) * 0.008, 0.28, 0.62 - ((u * 3 + v) % 5) * 0.025));
   });
   canopy.castShadow = true; trunks.castShadow = true;
   scene.add(canopy, trunks);
 
   // --- theme
+  const MODEL_COLORS = {
+    day: { plate: '#efe7dc', cornice: '#f1e8dc', cap: '#8d9694', roofbox: '#ece6dd', roofboxTop: '#c9c3b9', clay: '#ebe4d9', trunk: '#9c8670' },
+    night: { plate: '#2a2521', cornice: '#3a332d', cap: '#2b2f2f', roofbox: '#302b27', roofboxTop: '#24211e', clay: '#221e1b', trunk: '#3b332b' },
+  };
   let dark = null;
   function readTheme() {
     const t = document.documentElement.dataset.theme;
@@ -465,25 +324,26 @@ function createViewer(root, data, ui, reduceMotion) {
     const isDark = readTheme();
     if (isDark === dark) return;
     dark = isDark;
-    const bg = getComputedStyle(stage).getPropertyValue('--b3d-bg').trim() || (dark ? '#0f131a' : '#eceff5');
+    const C = MODEL_COLORS[dark ? 'night' : 'day'];
+    const bg = getComputedStyle(stage).getPropertyValue('--b3d-bg').trim() || (dark ? '#141110' : '#ece5da');
     scene.background = new Color(bg);
     scene.fog = new Fog(bg, 700, 1500);
-    baseGround.material.color.set(dark ? '#0f131a' : '#eceff5');
-    hemi.color.set(dark ? 0x3d4e74 : 0xffffff);
-    hemi.groundColor.set(dark ? 0x0d1015 : 0xdde2ea);
-    hemi.intensity = dark ? 1.0 : 2.1;
-    sun.color.set(dark ? 0xa8bce0 : 0xffffff);
-    sun.intensity = dark ? 0.8 : 1.6;
-    facadeMats.forEach((m) => { m.emissiveIntensity = dark ? 1.25 : 0; });
-    canopy.material.color.set(dark ? 0x2a3b2e : 0x9ccc8f);
-    const clay = srgb(dark ? '#1b222d' : '#e2e7ee');
-    parts.forEach((p) => p.material.userData.uClay.value.copy(clay));
-    if (groundTex) groundTex.dispose();
-    groundTex = new CanvasTexture(groundCanvas(dark, fonts));
-    groundTex.colorSpace = SRGBColorSpace;
-    groundTex.anisotropy = maxAniso;
-    ground.material.map = groundTex;
-    ground.material.needsUpdate = true;
+    baseGround.material.color.set(bg);
+    groundMat.uBg.value.copy(srgb(bg));
+    ground.geometry.dispose();
+    ground.geometry = buildGround(dark ? 'night' : 'day');
+    hemi.color.set(dark ? 0x3d3a4a : 0xffffff);
+    hemi.groundColor.set(dark ? 0x0e0c0b : 0xe9dfd2);
+    hemi.intensity = dark ? 1.45 : 2.0;
+    sun.color.set(dark ? 0xa9b8d8 : 0xfff3e4);
+    sun.intensity = dark ? 0.95 : 1.7;
+    if (dark && !glowTex) glowTex = arrayTexture(facadeLayers(true, facadeScale / 2));
+    mats.uniforms.uGlowMap.value = dark ? glowTex : noGlow;
+    mats.uniforms.uGlow.value = dark ? 1.25 : 0;
+    mats.uniforms.uClay.value.copy(srgb(C.clay));
+    recolor(model.geometry, model.roles, C);
+    canopy.material.color.set(dark ? 0x4a5a46 : 0xffffff);
+    trunks.material.color.set(C.trunk);
     roofTex.image = roofCanvas(dark);
     roofTex.needsUpdate = true;
     renderer.shadowMap.needsUpdate = true;
@@ -503,7 +363,9 @@ function createViewer(root, data, ui, reduceMotion) {
   controls.rotateSpeed = 0.7;
   controls.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_ROTATE };
   controls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
-  canvas.style.touchAction = 'pan-y'; // vertical swipes keep scrolling the page; sideways swipes turn the building
+  // a finger on the model turns the model and never scrolls the page; the page scrolls
+  // from anywhere outside it
+  canvas.style.touchAction = 'none';
 
   // scroll-wheel zoom only with ctrl/⌘ (or a trackpad pinch), so the page still scrolls over the map
   const hint = stage.querySelector('.b3d-hint');
@@ -516,7 +378,6 @@ function createViewer(root, data, ui, reduceMotion) {
     hintTimer = setTimeout(() => { hint.dataset.show = ''; }, 1400);
   }, { capture: true, passive: true });
 
-  const views = {};
   function fitDistance(radius) {
     const vfov = (camera.fov * Math.PI) / 180;
     const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
@@ -533,11 +394,27 @@ function createViewer(root, data, ui, reduceMotion) {
     let polar = 1.0;
     if (sel.wing === 5) { dir = Math.atan2(-0.35, 1); polar = 0.86; }
     const yTarget = sel.floor != null ? FLOORS[Math.min(sel.floor, 4)].y + 2 : 6;
-    return { target: new Vector3(cx, yTarget, cz), dist: Math.max(200, fitDistance(radius) * 0.95), polar, azim: dir + 0.42 };
+    return { target: new Vector3(cx, yTarget, cz), dist: Math.max(200, fitDistance(radius) * 0.95), polar, azim: dir + 0.42, shift: cardShift() };
+  }
+  // on wide screens the result card floats over the right of the model: frame the wing in the space beside it
+  const card = root.querySelector('.b3d-card');
+  function cardShift() {
+    if (card.dataset.state === 'empty') return 0;
+    const c = card.getBoundingClientRect(), s = stage.getBoundingClientRect();
+    if (!c.width || c.left < s.left + s.width / 2 || c.top > s.bottom || c.bottom < s.top) return 0;
+    return (s.right - c.left) / 2; // pixels to move the subject left
   }
   function placeFor(v) {
     const p = new Vector3(Math.sin(v.polar) * Math.sin(v.azim), Math.cos(v.polar), Math.sin(v.polar) * Math.cos(v.azim));
-    return { target: v.target.clone(), position: v.target.clone().add(p.multiplyScalar(v.dist)) };
+    const target = v.target.clone();
+    const shift = v.shift || 0;
+    if (shift) {
+      const h = stage.clientHeight || 1;
+      const metres = (shift * 2 * v.dist * Math.tan((camera.fov * Math.PI) / 360)) / h;
+      const right = new Vector3().crossVectors(p.clone().negate(), new Vector3(0, 1, 0)).normalize();
+      target.addScaledVector(right, metres);
+    }
+    return { target, position: target.clone().add(p.multiplyScalar(v.dist)) };
   }
 
   // --- tweens
@@ -570,49 +447,68 @@ function createViewer(root, data, ui, reduceMotion) {
   }
   controls.addEventListener('start', () => { if (flight) { tweens.delete(flight); flight = null; } });
 
-  // --- selection state, animated per mesh
+  // --- selection state, animated per part (wing × storey) through the uPart uniform array
   const LIFT = 8;
   let selection = { wing: null, floor: null };
   let anim = null;
-  function targetsFor(p) {
-    const { wing, level } = p.userData;
+  const state = Array.from({ length: PARTS }, () => ({ lift: 0, fade: 0, tint: 0, dim: 0, pastel: false }));
+  function targetFor(i) {
+    const wing = Math.floor(i / LEVELS), level = i % LEVELS;
     const any = selection.wing != null;
     const mine = any && wing === selection.wing;
     const hasFloor = mine && selection.floor != null;
+    const tint = !mine ? 0 : hasFloor ? (level === selection.floor ? 0.62 : level < selection.floor ? 0.35 : 0) : 0.55;
     return {
       dim: any && !mine ? (wing ? 0.62 : 0.7) : 0,
       lift: hasFloor && level > selection.floor ? LIFT : 0,
       fade: hasFloor && level > selection.floor ? 1 : 0,
-      tint: !mine ? 0 : hasFloor ? (level === selection.floor ? 0.62 : level < selection.floor ? 0.35 : 0) : 0.55,
+      tint,
     };
   }
-  parts.forEach((p) => { p.userData.cur = { dim: 0, lift: 0, fade: 0, tint: 0 }; });
+  function writeParts() {
+    const u = mats.uniforms.uPart.value;
+    let fading = false;
+    state.forEach((s, i) => {
+      u[i * 4] = s.lift; u[i * 4 + 1] = s.fade; u[i * 4 + 2] = s.pastel ? -s.tint : s.tint; u[i * 4 + 3] = s.dim;
+      if (s.fade > 0.001) fading = true;
+    });
+    ghost.visible = fading;
+  }
   function applySelection() {
-    const tint = selection.wing != null ? srgb(ui.wing(selection.wing).color) : null;
-    const from = parts.map((p) => ({ ...p.userData.cur }));
-    const to = parts.map((p) => targetsFor(p));
+    const from = state.map((s) => ({ ...s }));
+    const to = state.map((_, i) => targetFor(i));
     // the chosen floor gets the full wing colour, the rest of the wing a pastel of it
-    const pastel = tint ? tint.clone().lerp(new Vector3(1, 1, 1), 0.45) : null;
-    parts.forEach((p, i) => { if (tint && to[i].tint) p.material.userData.uTint.value.copy(to[i].tint >= 0.5 ? tint : pastel); });
+    state.forEach((s, i) => { if (to[i].tint) s.pastel = to[i].tint < 0.5; });
     if (anim) tweens.delete(anim);
     anim = tween(700, (e) => {
-      parts.forEach((p, i) => {
-        const c = p.userData.cur, a = from[i], b = to[i];
-        c.dim = a.dim + (b.dim - a.dim) * e;
-        c.lift = a.lift + (b.lift - a.lift) * e;
-        c.fade = a.fade + (b.fade - a.fade) * e;
-        c.tint = a.tint + (b.tint - a.tint) * e;
-        const u = p.material.userData;
-        u.uDim.value = c.dim;
-        u.uTintAmt.value = c.tint;
-        p.position.y = c.lift;
-        const transparent = c.fade > 0.001;
-        if (p.material.transparent !== transparent) { p.material.transparent = transparent; p.material.depthWrite = !transparent; p.material.needsUpdate = true; }
-        p.material.opacity = 1 - 0.86 * c.fade;
-        p.castShadow = c.fade < 0.5;
+      state.forEach((s, i) => {
+        const a = from[i], b = to[i];
+        s.dim = a.dim + (b.dim - a.dim) * e;
+        s.lift = a.lift + (b.lift - a.lift) * e;
+        s.fade = a.fade + (b.fade - a.fade) * e;
+        s.tint = a.tint + (b.tint - a.tint) * e;
       });
+      writeParts();
       renderer.shadowMap.needsUpdate = true;
     }, () => { anim = null; });
+  }
+
+  // is a point hidden behind the building? (rays against the part boxes, skipping see-through storeys)
+  const rayO = [0, 0, 0], rayD = [0, 0, 0];
+  function setRay(from, to) {
+    const dx = to.x - from.x, dy = to.y - from.y, dz = to.z - from.z;
+    const dist = Math.hypot(dx, dy, dz);
+    rayO[0] = from.x; rayO[1] = from.y; rayO[2] = from.z;
+    rayD[0] = dx / dist; rayD[1] = dy / dist; rayD[2] = dz / dist;
+    return dist;
+  }
+  function behind(pos) {
+    const dist = setRay(camera.position, pos) - 1.5;
+    for (let i = 0; i < boxes.length; i++) {
+      const s = state[boxes[i].part];
+      if (s.fade < 0.5 && rayBox(rayO, rayD, boxes[i], s.lift) < dist) return true;
+    }
+    return false;
   }
 
   // --- labels
@@ -628,7 +524,7 @@ function createViewer(root, data, ui, reduceMotion) {
     b.addEventListener('click', () => ui.select({ wing: selection.wing === w.n && selection.floor == null ? null : w.n }, 'badge'));
     labelsBox.appendChild(b);
     const box = wingBoxes.get(w.n);
-    badges.set(w.n, { el: b, pos: new Vector3((box.x0 + box.x1) / 2, w.n === 5 ? 26 : 25, (box.z0 + box.z1) / 2) });
+    badges.set(w.n, { el: b, pos: new Vector3((box.x0 + box.x1) / 2, w.n === 5 ? 26 : 25, (box.z0 + box.z1) / 2), at: { hidden: true } });
   });
   const pins = ENTRANCES.map((e) => {
     const el = document.createElement('div');
@@ -661,7 +557,7 @@ function createViewer(root, data, ui, reduceMotion) {
       const n = Math.max(1, Math.round((len - margin * 2) / step));
       for (let k = 0; k <= n; k++) at((margin + ((len - margin * 2) * k) / n) / len);
     });
-    return spots.sort((p, q) => p.d - q.d);
+    return spots.sort((p, q2) => p.d - q2.d);
   }
   const streetLabels = STREETS.map((st) => ({ name: st.name, spots: lineSpots(st.path, st.label, 50, 40) }));
   streetLabels.push({ name: 'Spree', river: true, spots: lineSpots(RIVER_BANK.map(([u, v]) => [u + 82, v]), [690, 470], 60, 10) });
@@ -672,8 +568,9 @@ function createViewer(root, data, ui, reduceMotion) {
     st.cur = null;
     labelsBox.appendChild(st.el);
   });
-  // the buttons and panels that sit on top of the model
+  // the buttons and panels that sit on top of the model; measured only when the layout changes
   const overlays = [stage.querySelector('.b3d-compass'), stage.querySelector('.b3d-tools'), root.querySelector('.b3d-floors'), root.querySelector('.b3d-finder'), root.querySelector('.b3d-card')].filter(Boolean);
+  let overlayBoxes = null;
 
   const proj = new Vector3();
   const ray = new Raycaster();
@@ -686,13 +583,6 @@ function createViewer(root, data, ui, reduceMotion) {
     el.style.setProperty('--y', `${y.toFixed(1)}px`);
     el.classList.toggle('is-hidden', hidden);
     return { x, y, hidden };
-  }
-  function behind(pos) {
-    const dir = pos.clone().sub(camera.position);
-    const dist = dir.length();
-    ray.set(camera.position, dir.normalize());
-    ray.far = dist - 1.5;
-    return ray.intersectObjects(pickables, false).some((h) => h.object.material.opacity > 0.5);
   }
 
   // Labels keep out of each other's way. Entrance addresses avoid the wing badges and
@@ -712,14 +602,20 @@ function createViewer(root, data, ui, reduceMotion) {
     return b.x - ex >= 0 && b.y - ey >= 0 && b.x + ex <= size.x && b.y + ey <= size.y;
   }
   function blockers() { // the wing badges, and the buttons and panels over the model
-    const o = labelsBox.getBoundingClientRect();
-    const list = [];
-    const add = (el, pad) => {
-      const r = el.getBoundingClientRect();
-      if (r.width) list.push(screenBox(r.left - o.left + r.width / 2, r.top - o.top + r.height / 2, r.width / 2 + pad, r.height / 2 + pad));
-    };
-    badges.forEach(({ el }) => { if (!el.classList.contains('is-hidden')) add(el, 4); });
-    overlays.forEach((el) => add(el, 2));
+    if (!overlayBoxes) {
+      const o = labelsBox.getBoundingClientRect();
+      overlayBoxes = [];
+      overlays.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width) overlayBoxes.push(screenBox(r.left - o.left + r.width / 2, r.top - o.top + r.height / 2, r.width / 2 + 2, r.height / 2 + 2));
+      });
+    }
+    const list = overlayBoxes.slice();
+    badges.forEach(({ at }, n) => {
+      if (at.hidden) return;
+      const half = (selection.wing === n ? 15 * 1.25 : 15) + 4; // badges are 30px, the chosen one is scaled up
+      list.push(screenBox(at.x, at.y, half, half));
+    });
     return list;
   }
   // an entrance's address goes right of its pin, else left, else below: wherever it is clear.
@@ -774,10 +670,10 @@ function createViewer(root, data, ui, reduceMotion) {
   }
   function updateLabels() {
     renderer.getSize(size);
-    badges.forEach(({ el, pos }, n) => {
-      place(el, pos, false);
-      el.classList.toggle('is-active', selection.wing === n);
-      el.classList.toggle('is-muted', selection.wing != null && selection.wing !== n);
+    badges.forEach((b, n) => {
+      b.at = place(b.el, b.pos, false);
+      b.el.classList.toggle('is-active', selection.wing === n);
+      b.el.classList.toggle('is-muted', selection.wing != null && selection.wing !== n);
     });
     const at = pins.map((p) => {
       p.el.classList.toggle('is-active', selection.wing != null && p.data.wings.includes(selection.wing));
@@ -802,11 +698,17 @@ function createViewer(root, data, ui, reduceMotion) {
     if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 7 || performance.now() - down.t > 450) { down = null; return; }
     down = null;
     const rect = canvas.getBoundingClientRect();
-    const ndc = new Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
-    ray.setFromCamera(ndc, camera);
-    ray.far = Infinity;
-    const hit = ray.intersectObjects(pickables, false).find((h) => h.object.material.opacity > 0.5);
-    if (hit) ui.select({ wing: hit.object.userData.wing }, 'tap');
+    ray.setFromCamera(new Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1), camera);
+    const o = ray.ray.origin, d = ray.ray.direction;
+    rayO[0] = o.x; rayO[1] = o.y; rayO[2] = o.z; rayD[0] = d.x; rayD[1] = d.y; rayD[2] = d.z;
+    let best = Infinity, wing = 0;
+    boxes.forEach((b) => {
+      const s = state[b.part];
+      if (s.fade > 0.5) return;
+      const t = rayBox(rayO, rayD, b, s.lift);
+      if (t < best) { best = t; wing = b.wing; }
+    });
+    if (wing) ui.select({ wing }, 'tap');
     else if (selection.wing != null) ui.select({ wing: null }, 'tap');
   });
 
@@ -831,8 +733,8 @@ function createViewer(root, data, ui, reduceMotion) {
     const moved = controls.update();
     if (animating || moved || dirty) {
       dirty = false;
-      const d = camera.position.distanceTo(controls.target); // fog follows the zoom so the horizon always fades out
-      if (scene.fog) { scene.fog.near = d * 0.95; scene.fog.far = d * 1.7; }
+      const d = camera.position.distanceTo(controls.target); // fog only reaches the far horizon
+      if (scene.fog) { scene.fog.near = d * 1.3; scene.fog.far = d * 2.6; }
       renderer.render(scene, camera);
       updateLabels();
     }
@@ -843,6 +745,7 @@ function createViewer(root, data, ui, reduceMotion) {
 
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
+    overlayBoxes = null;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
@@ -853,11 +756,11 @@ function createViewer(root, data, ui, reduceMotion) {
   resize();
 
   applyTheme();
-  if (document.fonts) document.fonts.ready.then(() => { // redraw and re-measure street names once the web font is in
+  if (document.fonts) document.fonts.ready.then(() => { // re-measure labels once the web font is in
     streetLabels.forEach((st) => { st.w = 0; });
     pins.forEach((p) => { p.lw = 0; });
-    dark = null;
-    applyTheme();
+    overlayBoxes = null;
+    requestRender();
   });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
   new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -878,6 +781,7 @@ function createViewer(root, data, ui, reduceMotion) {
   return {
     select(sel, source) {
       selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null };
+      overlayBoxes = null; // the floor stepper and the card may have changed size
       applySelection();
       if (!introDone) { pending = selection.wing != null ? selection : null; return; }
       if (source === 'tap' && selection.wing != null) { requestRender(); return; } // keep the camera where the user put it

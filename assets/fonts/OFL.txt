@@ -1,11 +1,8 @@
 The fonts in this folder are self-hosted so visitors' browsers never contact a font service.
-They are the Latin subsets of the variable fonts, as published by Fontsource.
 
-bricolage-grotesque.woff2 (Bricolage Grotesque, by Mathieu Triay, weights 200-800 and optical sizes):
-Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)
-
-geist.woff2 and geist-mono.woff2 (Geist and Geist Mono, by Vercel and basement.studio, weights 100-900):
-Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
+d-din-pro-*.woff2 (D-DIN PRO, by Charles Nix for Datto, a revival of DIN 1451, weights 400, 500, 700, 800):
+Copyright (c) 2017, Datto Inc. (fonts@datto.com), with Reserved Font Name D-DIN.
+Converted from the original OTF files to WOFF2 for the web; the font data is otherwise unchanged.
 
 They are licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

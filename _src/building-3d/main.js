@@ -316,12 +316,19 @@ function createViewer(root, data, ui, reduceMotion) {
     night: { plate: '#2a2521', cornice: '#3a332d', cap: '#2b2f2f', roofbox: '#302b27', roofboxTop: '#24211e', clay: '#221e1b', trunk: '#3b332b' },
   };
   let dark = null;
-  function readTheme() {
+  const sceneBtn = stage.querySelector('.b3d-scene');
+  function siteIsDark() {
     const t = document.documentElement.dataset.theme;
     return t === 'dark' ? true : t === 'light' ? false : matchMedia('(prefers-color-scheme: dark)').matches;
   }
+  // the map follows the site unless its own day/night button says otherwise (data-scene)
+  function readTheme() {
+    const s = stage.dataset.scene;
+    return s === 'night' ? true : s === 'day' ? false : siteIsDark();
+  }
   function applyTheme() {
     const isDark = readTheme();
+    if (sceneBtn) sceneBtn.setAttribute('aria-pressed', String(isDark));
     if (isDark === dark) return;
     dark = isDark;
     const C = MODEL_COLORS[dark ? 'night' : 'day'];
@@ -332,11 +339,12 @@ function createViewer(root, data, ui, reduceMotion) {
     groundMat.uBg.value.copy(srgb(bg));
     ground.geometry.dispose();
     ground.geometry = buildGround(dark ? 'night' : 'day');
-    hemi.color.set(dark ? 0x3d3a4a : 0xffffff);
-    hemi.groundColor.set(dark ? 0x0e0c0b : 0xe9dfd2);
-    hemi.intensity = dark ? 1.45 : 2.0;
-    sun.color.set(dark ? 0xa9b8d8 : 0xfff3e4);
-    sun.intensity = dark ? 0.95 : 1.7;
+    // night is moonlight: a soft cool sky and a weak moon, so the street plan still reads
+    hemi.color.set(dark ? 0x7a7c8c : 0xffffff);
+    hemi.groundColor.set(dark ? 0x241f1b : 0xe9dfd2);
+    hemi.intensity = dark ? 2.4 : 2.0;
+    sun.color.set(dark ? 0xc8d0e0 : 0xfff3e4);
+    sun.intensity = dark ? 1.0 : 1.7;
     if (dark && !glowTex) glowTex = arrayTexture(facadeLayers(true, facadeScale / 2));
     mats.uniforms.uGlowMap.value = dark ? glowTex : noGlow;
     mats.uniforms.uGlow.value = dark ? 1.25 : 0;
@@ -569,7 +577,7 @@ function createViewer(root, data, ui, reduceMotion) {
     labelsBox.appendChild(st.el);
   });
   // the buttons and panels that sit on top of the model; measured only when the layout changes
-  const overlays = [stage.querySelector('.b3d-compass'), stage.querySelector('.b3d-tools'), root.querySelector('.b3d-floors'), root.querySelector('.b3d-finder'), root.querySelector('.b3d-card')].filter(Boolean);
+  const overlays = [stage.querySelector('.b3d-compass'), sceneBtn, stage.querySelector('.b3d-tools'), root.querySelector('.b3d-floors'), root.querySelector('.b3d-finder'), root.querySelector('.b3d-card')].filter(Boolean);
   let overlayBoxes = null;
 
   const proj = new Vector3();
@@ -710,6 +718,18 @@ function createViewer(root, data, ui, reduceMotion) {
     });
     if (wing) ui.select({ wing }, 'tap');
     else if (selection.wing != null) ui.select({ wing: null }, 'tap');
+  });
+
+  // --- day/night button: remembered on this device only while it differs from the rest of the site
+  if (sceneBtn) sceneBtn.addEventListener('click', () => {
+    const night = !readTheme();
+    if (night === siteIsDark()) delete stage.dataset.scene;
+    else stage.dataset.scene = night ? 'night' : 'day';
+    try {
+      if (stage.dataset.scene) localStorage.setItem('map-scene', stage.dataset.scene);
+      else localStorage.removeItem('map-scene');
+    } catch { /* private mode: still switches for this visit */ }
+    applyTheme();
   });
 
   // --- reset + zoom buttons

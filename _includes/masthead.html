@@ -4,6 +4,10 @@
       {% include symbol.html %}
       <span class="brand-name"><span class="brand-pre">Wasserstadt </span>Spindlersfeld</span>
     </a>
+    <details class="theme-menu">
+      <summary class="theme-button" aria-label="Appearance">{% include icon.html name="system" weight=2 %}{% include icon.html name="sun" weight=2 %}{% include icon.html name="moon" weight=2 %}</summary>
+      <div class="theme-panel">{% include appearance.html id="top" %}</div>
+    </details>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
       <span class="menu-word"><span class="menu-open">Menu</span><span class="menu-close">Close</span></span>
       <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
@@ -14,6 +18,7 @@
         <li style="--i: {{ forloop.index }}; --dye: {{ s.dye }}"><a class="nav-link" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}><span class="nav-num">0{{ forloop.index }}</span><span class="nav-title">{{ s.title }}</span><span class="nav-blurb">{{ s.blurb }}</span>{% include icon.html name="arrow" weight=2 %}</a></li>
         {%- endfor %}
       </ul>
+      <div class="nav-settings">{% include appearance.html id="sheet" %}</div>
       <p class="nav-foot">Collected by residents, for residents</p>
     </nav>
   </div>

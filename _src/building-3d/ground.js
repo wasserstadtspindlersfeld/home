@@ -6,7 +6,7 @@ import { STREETS, RIVER_BANK, MASSES, toWorld, UNIT } from './geometry.js';
 
 const GROUND_COLORS = {
   day: { base: '#e9e2d6', walk: '#f4efe7', road: '#dad2c5', lane: '#fbf8f3', plaza: '#efe9df', lawn: '#cddbb6', lawnEdge: '#bccd9f', sand: '#ecd9b6', river: '#a9cad6', river2: '#8fb7c7', bank: '#d6e0c4', footprint: '#d8cfc1' },
-  night: { base: '#1c1916', walk: '#23201c', road: '#151310', lane: '#3a352e', plaza: '#211e1a', lawn: '#1d281c', lawnEdge: '#233022', sand: '#2b261e', river: '#10212b', river2: '#0c1a22', bank: '#1a2219', footprint: '#181513' },
+  night: { base: '#494235', walk: '#585043', road: '#36302a', lane: '#8a8070', plaza: '#524a3d', lawn: '#3b4e34', lawnEdge: '#46603e', sand: '#64563f', river: '#21465e', river2: '#1b3a4f', bank: '#3c4b33', footprint: '#433b31' },
 };
 
 export function buildGround(theme) {

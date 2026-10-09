@@ -32,6 +32,46 @@ if (toggle && nav) {
   matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
 }
 
+// Light or dark: "system" follows the phone or computer; a light or dark choice is remembered
+// on this device. The head of every page applies the saved choice before the first paint.
+const root = document.documentElement;
+const THEMES = ['system', 'light', 'dark'];
+const BAR_COLORS = { light: '#f5f0e8', dark: '#14110e' };
+const savedTheme = () => { try { return localStorage.getItem('theme'); } catch { return null; } };
+let themeSet = root.hasAttribute('data-theme') && THEMES.includes(savedTheme());
+function setTheme(pref) {
+  if (pref === 'light' || pref === 'dark') { root.dataset.theme = pref; themeSet = true; }
+  else if (themeSet) { delete root.dataset.theme; themeSet = false; } // leave a theme we didn't set alone
+  root.dataset.themePref = pref;
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => {
+    const forDark = (m.getAttribute('media') || '').includes('dark');
+    m.setAttribute('content', BAR_COLORS[pref === 'system' ? (forDark ? 'dark' : 'light') : pref]);
+  });
+  document.querySelectorAll('[data-appearance] input').forEach((i) => { i.checked = i.value === pref; });
+}
+setTheme(THEMES.includes(savedTheme()) ? savedTheme() : 'system');
+document.querySelectorAll('[data-appearance]').forEach((group) => group.addEventListener('change', (e) => {
+  const pref = e.target.value;
+  try { if (pref === 'system') localStorage.removeItem('theme'); else localStorage.setItem('theme', pref); } catch { /* private mode: still switch this page */ }
+  setTheme(pref);
+}));
+window.addEventListener('storage', (e) => { if (e.key === 'theme') setTheme(THEMES.includes(e.newValue) ? e.newValue : 'system'); });
+window.addEventListener('pageshow', (e) => { if (e.persisted) setTheme(THEMES.includes(savedTheme()) ? savedTheme() : 'system'); });
+
+// The appearance pop-up in the header closes after a tap on a choice, a tap outside, or Escape
+const themeMenu = document.querySelector('.theme-menu');
+if (themeMenu) {
+  let byPointer = false;
+  themeMenu.addEventListener('pointerdown', () => { byPointer = true; });
+  themeMenu.addEventListener('keydown', (e) => {
+    byPointer = false;
+    if (e.key === 'Escape' && themeMenu.open) { themeMenu.open = false; themeMenu.querySelector('summary').focus(); }
+  });
+  themeMenu.addEventListener('change', () => { if (byPointer) themeMenu.open = false; }); // arrow keys keep it open
+  document.addEventListener('click', (e) => { if (themeMenu.open && !themeMenu.contains(e.target)) themeMenu.open = false; });
+  window.addEventListener('pagehide', () => { themeMenu.open = false; });
+}
+
 // What a link in a fact row does, and how its value reads best
 function actionFor(a) {
   const href = a.getAttribute('href') || '';

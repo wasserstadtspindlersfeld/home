@@ -6,11 +6,13 @@
   </div>
 
   <div class="b3d-stage">
+    <script>try { var s = localStorage.getItem('map-scene'); if (s === 'day' || s === 'night') document.currentScript.parentNode.dataset.scene = s; } catch (e) {}</script>
     <canvas class="b3d-canvas" role="img" aria-label="3D model of the building and its nine wings. The wing buttons below the model do the same as tapping it."></canvas>
     <div class="b3d-labels"></div>
     <div class="b3d-compass" aria-hidden="true">
       <span class="b3d-compass-needle"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2.5 15.5 12h-7z" fill="currentColor"/><path d="M12 21.5 8.5 12h7z" fill="currentColor" opacity=".3"/></svg><span class="b3d-compass-n">N</span></span>
     </div>
+    <button type="button" class="b3d-tool b3d-scene" aria-pressed="false" aria-label="Night view" title="Night view">{% include icon.html name="moon" weight=2 %}</button>
     <div class="b3d-tools">
       <button type="button" class="b3d-tool b3d-zoom" data-dir="in" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
       <button type="button" class="b3d-tool b3d-zoom" data-dir="out" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/></svg></button>

@@ -17,16 +17,19 @@ const ICONS = {
 const icon = (name) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 
-// Menu button (phones)
+// Menu button (phones): a full-screen sheet; the page behind it doesn't scroll
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.getElementById('site-nav');
 if (toggle && nav) {
   const setOpen = (open) => {
     toggle.setAttribute('aria-expanded', String(open));
     nav.dataset.open = String(open);
+    document.documentElement.toggleAttribute('data-menu-open', open);
   };
   toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  nav.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); } });
+  matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
 }
 
 // What a link in a fact row does, and how its value reads best
@@ -94,7 +97,7 @@ document.querySelectorAll('.prose table').forEach((table) => {
 });
 
 // Lists of PDF links become download rows
-document.querySelectorAll('.prose ul').forEach((ul) => {
+document.querySelectorAll('.prose ul:not(.facts)').forEach((ul) => {
   const items = [...ul.children];
   const isDocs = items.length > 0 && items.every((li) => {
     const a = li.querySelector('a');

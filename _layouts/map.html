@@ -1,9 +1,9 @@
 ---
 layout: default
 ---
-{%- assign section = site.data.sections | where: "url", page.url | first -%}
-<main id="main" class="page page-map">
-  {% include page-head.html section=section %}
+{%- include find-section.html -%}
+<main id="main" class="page page-map" style="--dye: {{ section.dye | default: '#B4492F' }}; --dye-ink: {{ section.dye_ink | default: '#ffffff' }}">
+  {% include page-head.html %}
   {% include building-3d.html %}
   <article class="prose">
 {{ content }}

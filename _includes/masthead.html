@@ -1,21 +1,20 @@
 <header class="masthead">
-  <div class="masthead-inner">
+  <div class="masthead-bar">
     <a class="brand" href="{{ '/' | relative_url }}" aria-label="Wasserstadt Spindlersfeld, home page">
       {% include symbol.html %}
-      <span class="brand-text">
-        <span class="brand-name">Wasserstadt Spindlersfeld</span>
-        <span class="brand-sub">Residents' guide</span>
-      </span>
+      <span class="brand-name"><span class="brand-pre">Wasserstadt </span>Spindlersfeld</span>
     </a>
-    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
-      {% include icon.html name="menu" weight=2 %}{% include icon.html name="close" weight=2 %}
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-word"><span class="menu-open">Menu</span><span class="menu-close">Close</span></span>
+      <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
     </button>
     <nav id="site-nav" class="site-nav" aria-label="Sections" data-open="false">
-      <ul>
+      <ul class="nav-list">
         {%- for s in site.data.sections %}
-        <li><a class="dir-row" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}><span class="plate">{% include icon.html name=s.icon weight=2 %}</span><span class="dir-text"><span class="dir-title">{{ s.title }}</span></span>{% include icon.html name="arrow" weight=2 %}</a></li>
+        <li style="--i: {{ forloop.index }}; --dye: {{ s.dye }}"><a class="nav-link" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}><span class="nav-num">0{{ forloop.index }}</span><span class="nav-title">{{ s.title }}</span><span class="nav-blurb">{{ s.blurb }}</span>{% include icon.html name="arrow" weight=2 %}</a></li>
         {%- endfor %}
       </ul>
+      <p class="nav-foot">Collected by residents, for residents</p>
     </nav>
   </div>
 </header>

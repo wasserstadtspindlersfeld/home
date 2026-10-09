@@ -1,11 +1,11 @@
 ---
 layout: default
 ---
-{%- assign section = site.data.sections | where: "url", page.url | first -%}
-<main id="main" class="page">
-  {% include page-head.html section=section %}
+{%- include find-section.html -%}
+<main id="main" class="page" style="--dye: {{ section.dye | default: '#B4492F' }}; --dye-ink: {{ section.dye_ink | default: '#ffffff' }}">
+  {% include page-head.html %}
   {%- if page.toc %}
-  <nav class="toc" data-toc hidden aria-label="On this page"><p class="toc-label">On this page</p></nav>
+  <nav class="toc panel" data-toc hidden aria-label="On this page"><p class="toc-label">On this page</p></nav>
   {%- endif %}
   <article class="prose"{% if page.accordion %} data-accordion{% endif %}{% if page.places %} data-places{% endif %}>
 {{ content }}

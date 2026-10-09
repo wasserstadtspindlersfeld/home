@@ -23,11 +23,15 @@ layout: default
 {%- endif -%}
 {%- assign img = '/assets/img/' | relative_url -%}
 <main id="main" class="home">
-  <section class="hero" aria-labelledby="hero-title">
-    <p class="kicker"><span class="plate plate-s">{% include icon.html name="pin" weight=2 %}</span><span>Berlin-Köpenick, on the Spree</span></p>
-    <h1 class="hero-title" id="hero-title">Wasserstadt Spindlersfeld</h1>
+  <section class="home-top" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="tag"><span class="tag-dot"></span>Berlin-Köpenick · On the Spree</p>
+      <h1 class="hero-title" id="hero-title"><span class="hero-pre">Wasserstadt</span> <span class="hero-main">Spindlersfeld</span></h1>
+    </div>
+
     <figure class="hero-photo">
-      <img id="hero-img" src="{{ img }}hero-spring-1200.webp" srcset="{{ img }}hero-spring-800.webp 800w, {{ img }}hero-spring-1200.webp 1200w, {{ img }}hero-spring-1536.webp 1536w" sizes="(min-width: 1100px) 1040px, calc(100vw - 32px)" width="1536" height="1024" fetchpriority="high" alt="The Ringbau from above in spring, with the Spree behind it">
+      <img id="hero-img" src="{{ img }}hero-spring-1200.webp" srcset="{{ img }}hero-spring-800.webp 800w, {{ img }}hero-spring-1200.webp 1200w, {{ img }}hero-spring-1536.webp 1536w" sizes="(min-width: 1024px) 560px, calc(100vw - 32px)" width="1536" height="1024" fetchpriority="high" alt="The Ringbau from above in spring, with the Spree behind it">
+      <figcaption class="hero-chip"><b>1873</b>The old Spindler dye works</figcaption>
       <script>
         (function () {
           var d = new Date(), m = d.getMonth();
@@ -40,51 +44,53 @@ layout: default
         })();
       </script>
     </figure>
-  </section>
 
-  <div class="home-body">
-    <div class="prose home-intro">
+    <div class="prose hero-intro">
 {{ intro }}
     </div>
 
-    <form class="door-finder panel" action="{{ '/maps/maps.html' | relative_url }}" autocomplete="off">
+    <form class="door-finder" action="{{ '/maps/maps.html' | relative_url }}" autocomplete="off">
       <div class="finder-head">
-        <label class="finder-label" for="home-door">Find a door</label>
-        <span class="sign sign-mini" aria-hidden="true"><span class="sign-seg"><b>1</b><em>Wing</em></span><span class="sign-seg"><b>2</b><em>Floor</em></span><span class="sign-seg"><b>3</b><em>Door</em></span></span>
+        <label class="finder-label" for="home-door">Find<br>a door</label>
+        <span class="arches" aria-hidden="true"><span class="arch"><b>1</b><em>Wing</em></span><span class="arch"><b>2</b><em>Floor</em></span><span class="arch"><b>3</b><em>Door</em></span></span>
       </div>
       <div class="finder-row">
         <input id="home-door" name="door" inputmode="decimal" enterkeyhint="go" placeholder="1.2.3" aria-describedby="home-door-help">
-        <button type="submit" class="btn">Show {% include icon.html name="arrow" weight=2 %}</button>
+        <button type="submit" class="btn btn-round" aria-label="Show on the map">{% include icon.html name="arrow" weight=2 %}</button>
       </div>
       <p class="finder-help" id="home-door-help">Door numbers are <b>wing.floor.door</b>, so 1.2.3 is wing 1, 2nd floor, door 3.</p>
     </form>
+  </section>
 
-    <nav class="directory" aria-label="Sections">
+  <section class="guide" aria-labelledby="guide-title">
+    <div class="guide-head">
+      <h2 class="guide-title" id="guide-title">The guide</h2>
+      <p class="label">{{ site.data.sections | size }} sections</p>
+    </div>
+    <nav class="bento" aria-labelledby="guide-title">
       {%- for s in site.data.sections %}{% if s.featured %}
-      <a class="map-card panel" href="{{ s.url | relative_url }}">
-        <img class="map-card-img" src="{{ img }}map-preview.webp" width="1200" height="760" alt="The 3D model of the building, seen from Adolf-Heyden-Straße" loading="lazy">
-        <span class="dir-row">
-          <span class="plate">{% include icon.html name=s.icon weight=2 %}</span>
-          <span class="dir-text"><span class="dir-title">{{ s.title }}</span><span class="dir-blurb">{{ s.blurb }}</span></span>
-          {% include icon.html name="arrow" weight=2 %}
+      <a class="tile tile-map" href="{{ s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
+        <img class="tile-img" src="{{ img }}map-preview.webp" width="1200" height="760" alt="The 3D model of the building" loading="lazy">
+        <span class="tile-badge">3D model</span>
+        <span class="tile-body">
+          <span class="tile-title">{{ s.title }}</span>
+          <span class="tile-blurb">{{ s.blurb }}</span>
         </span>
+        <span class="tile-go">{% include icon.html name="arrow" weight=2 %}</span>
       </a>
       {%- endif %}{% endfor %}
-      <ul class="dir-list panel">
-        {%- for s in site.data.sections %}{% unless s.featured %}
-        <li>
-          <a class="dir-row" href="{{ s.url | relative_url }}">
-            <span class="plate">{% include icon.html name=s.icon weight=2 %}</span>
-            <span class="dir-text"><span class="dir-title">{{ s.title }}</span><span class="dir-blurb">{{ s.blurb }}</span></span>
-            {% include icon.html name="arrow" weight=2 %}
-          </a>
-        </li>
-        {%- endunless %}{% endfor %}
-      </ul>
+      {%- for s in site.data.sections %}{% unless s.featured %}
+      <a class="tile" href="{{ s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
+        <span class="tile-arch">{% include icon.html name=s.icon weight=2 %}</span>
+        <span class="tile-title">{{ s.title }}</span>
+        <span class="tile-blurb">{{ s.blurb }}</span>
+        <span class="tile-go">{% include icon.html name="arrow" weight=2 %}</span>
+      </a>
+      {%- endunless %}{% endfor %}
     </nav>
+  </section>
 
-    <div class="prose home-rest">
+  <div class="prose home-rest">
 {{ rest }}
-    </div>
   </div>
 </main>

@@ -19,6 +19,33 @@ import { parseDoor, doorHash } from './door.js';
 const WASHER = '<rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M4.5 7.5h15"/><circle cx="12" cy="14" r="4.25"/><path d="M7.5 5.25h.01M10.5 5.25h.01"/>';
 const washerIcon = () => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${WASHER}</svg>`;
 
+// The map's words in the page's language. Wing, floor and entrance names come from _data/building.yml.
+const LANG = document.documentElement.lang === 'de' ? 'de' : 'en';
+const TEXT = {
+  en: {
+    wing: 'Wing', floor: 'Floor', door: 'Door', doorInline: 'door', entrance: 'Street entrance',
+    pickFloor: 'Pick a floor below the model to see where it is.',
+    share: 'Share this location', copy: 'Copy link', copied: 'Link copied', clear: 'Clear', colour: 'Wing colour',
+    laundry: 'Laundry room', laundryPlate: 'Laundry', at: (where) => `At ${where}`, laundryAt: (where) => `Laundry room at ${where}`,
+    washers: 'Washing machines', dryers: 'Dryers', vending: 'Vending machines', none: 'None',
+  },
+  de: {
+    wing: 'Flügel', floor: 'Etage', door: 'Tür', doorInline: 'Tür', entrance: 'Hauseingang',
+    pickFloor: 'Wähle unten eine Etage, dann siehst du, wo sie liegt.',
+    share: 'Ort teilen', copy: 'Link kopieren', copied: 'Link kopiert', clear: 'Zurücksetzen', colour: 'Flügelfarbe',
+    laundry: 'Waschraum', laundryPlate: 'Waschraum', at: (where) => `Am Eingang ${where}`, laundryAt: (where) => `Waschraum am Eingang ${where}`,
+    washers: 'Waschmaschinen', dryers: 'Trockner', vending: 'Automaten', none: 'Keine',
+  },
+}[LANG];
+// a new result card eases in (not when the phone or computer asks for reduced motion)
+const easeIn = (el) => {
+  if (!el.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.animate({ opacity: [0, 1], transform: ['translateY(8px)', 'none'] }, { duration: 300, easing: 'cubic-bezier(0.2, 0.75, 0.25, 1)' });
+};
+// a data entry's text in the page's language, from its de: block where there is one
+const local = (item, key) => (LANG === 'de' && item.de && item.de[key]) || item[key];
+const floorName = (f) => (LANG === 'de' ? f.de_long || f.de : f.en);
+
 const root = document.getElementById('building-3d');
 if (root) start(root);
 
@@ -59,7 +86,7 @@ function createUI(root, data) {
     b.className = 'b3d-step';
     b.dataset.floor = f.n;
     b.textContent = f.n;
-    b.setAttribute('aria-label', `${f.en} (${f.de})`);
+    b.setAttribute('aria-label', `${floorName(f)} (${f.de})`);
     b.setAttribute('aria-pressed', 'false');
     b.addEventListener('click', () => {
       if (current.wing == null) return;
@@ -92,7 +119,7 @@ function createUI(root, data) {
     b.style.setProperty('--swatch', w.color);
     b.style.setProperty('--plate-ink', w.ink);
     b.setAttribute('aria-pressed', 'false');
-    b.innerHTML = `<span class="b3d-chip-n">${w.n}</span><span class="sr-only">Wing ${w.n}</span>`;
+    b.innerHTML = `<span class="b3d-chip-n">${w.n}</span><span class="sr-only">${TEXT.wing} ${w.n}</span>`;
     b.addEventListener('click', () => select({ wing: current.wing === w.n && current.floor == null ? null : w.n, floor: null, door: null }, 'chip'));
     chipsBox.appendChild(b);
   });
@@ -118,27 +145,28 @@ function createUI(root, data) {
     if (form.classList.contains('has-error')) { form.classList.remove('has-error'); help.innerHTML = defaultHelp; }
   });
 
-  function ordinal(n) { return data.floors[n] ? data.floors[n].en : `Floor ${n}`; }
+  function ordinal(n) { return data.floors[n] ? floorName(data.floors[n]) : `${TEXT.floor} ${n}`; }
 
   function renderLaundry(l) {
-    const where = entrances.get(l.entrance).label;
+    const where = local(entrances.get(l.entrance), 'label');
     card.dataset.state = 'laundry';
     const facts = [
-      ['Washing machines', l.washers],
-      ['Dryers', l.dryers],
-      ['Vending machines', l.vending && l.vending.length ? l.vending.join(' · ') : 'None'],
+      [TEXT.washers, l.washers],
+      [TEXT.dryers, l.dryers],
+      [TEXT.vending, l.vending && l.vending.length ? local(l, 'vending').join(' · ') : TEXT.none],
     ];
     card.innerHTML = `
-      <div class="sign" aria-hidden="true"><span class="sign-seg is-laundry"><b>${washerIcon()}</b><em>Laundry</em></span></div>
-      <h3 class="b3d-card-title">Laundry room</h3>
-      <p class="b3d-card-where">At ${where}</p>
+      <div class="sign" aria-hidden="true"><span class="sign-seg is-laundry"><b>${washerIcon()}</b><em>${TEXT.laundryPlate}</em></span></div>
+      <h3 class="b3d-card-title">${TEXT.laundry}</h3>
+      <p class="b3d-card-where">${TEXT.at(where)}</p>
       <ul class="facts panel">${facts.map(([k, v]) => `<li><div class="fact"><span class="fact-k">${k}</span><span class="fact-v">${v}</span></div></li>`).join('')}</ul>
       <div class="b3d-card-actions">
-        <button type="button" class="btn b3d-share">${navigator.share ? 'Share this location' : 'Copy link'}</button>
-        <button type="button" class="btn btn-quiet b3d-clear">Clear</button>
+        <button type="button" class="btn b3d-share">${navigator.share ? TEXT.share : TEXT.copy}</button>
+        <button type="button" class="btn btn-quiet b3d-clear">${TEXT.clear}</button>
       </div>`;
     card.querySelector('.b3d-clear').addEventListener('click', () => select({ wing: null }, 'clear'));
     card.querySelector('.b3d-share').addEventListener('click', share);
+    easeIn(card);
   }
 
   function renderCard(sel) {
@@ -149,43 +177,45 @@ function createUI(root, data) {
     const floor = sel.floor != null ? data.floors[sel.floor] : null;
     card.dataset.state = 'wing';
     card.style.setProperty('--swatch', w.color);
-    const wingSeg = `<span class="sign-seg is-wing" style="--swatch:${w.color};--plate-ink:${w.ink}"><b>${w.n}</b><em>Wing</em></span>`;
+    const wingSeg = `<span class="sign-seg is-wing" style="--swatch:${w.color};--plate-ink:${w.ink}"><b>${w.n}</b><em>${TEXT.wing}</em></span>`;
     const sign = sel.floor != null
-      ? `${wingSeg}<span class="sign-seg"><b>${sel.floor}</b><em>Floor</em></span><span class="sign-seg"><b>${sel.door != null ? sel.door : '–'}</b><em>Door</em></span>`
+      ? `${wingSeg}<span class="sign-seg"><b>${sel.floor}</b><em>${TEXT.floor}</em></span><span class="sign-seg"><b>${sel.door != null ? sel.door : '–'}</b><em>${TEXT.door}</em></span>`
       : wingSeg;
-    const reading = [`Wing ${w.n}`, floor ? floor.en : null, sel.door != null ? `door ${sel.door}` : null].filter(Boolean).join(', ');
+    const reading = [`${TEXT.wing} ${w.n}`, floor ? floorName(floor) : null, sel.door != null ? `${TEXT.doorInline} ${sel.door}` : null].filter(Boolean).join(', ');
     const facts = [
-      floor ? ['Floor', `${floor.en} · ${floor.de}`] : null,
-      ...ents.map((e) => ['Street entrance', e.label]),
+      floor ? [TEXT.floor, `${floorName(floor)} · ${floor.de}`] : null,
+      ...ents.map((e) => [TEXT.entrance, local(e, 'label')]),
     ].filter(Boolean);
     card.innerHTML = `
       <div class="sign" aria-hidden="true">${sign}</div>
       <h3 class="b3d-card-title">${reading}</h3>
-      <p class="b3d-card-where">${w.where}</p>
+      <p class="b3d-card-where">${local(w, 'where')}</p>
       ${facts.length ? `<ul class="facts panel">${facts.map(([k, v]) => `<li><div class="fact"><span class="fact-k">${k}</span><span class="fact-v">${v}</span></div></li>`).join('')}</ul>` : ''}
       ${sel.floorNote ? `<p class="b3d-card-note">${sel.floorNote}</p>` : ''}
-      ${sel.floor == null ? `<p class="b3d-card-note">Pick a floor below the model to see where it is.</p>` : ''}
+      ${sel.floor == null ? `<p class="b3d-card-note">${TEXT.pickFloor}</p>` : ''}
       <div class="b3d-card-actions">
-        <button type="button" class="btn b3d-share">${navigator.share ? 'Share this location' : 'Copy link'}</button>
-        <button type="button" class="btn btn-quiet b3d-clear">Clear</button>
+        <button type="button" class="btn b3d-share">${navigator.share ? TEXT.share : TEXT.copy}</button>
+        <button type="button" class="btn btn-quiet b3d-clear">${TEXT.clear}</button>
       </div>
-      <p class="b3d-swatch-note"><span class="b3d-swatch" aria-hidden="true"></span>Wing colour: ${w.dye}</p>`;
+      <p class="b3d-swatch-note"><span class="b3d-swatch" aria-hidden="true"></span>${TEXT.colour}: ${local(w, 'dye')}</p>`;
     card.querySelector('.b3d-clear').addEventListener('click', () => select({ wing: null }, 'clear'));
     card.querySelector('.b3d-share').addEventListener('click', share);
+    easeIn(card);
   }
 
   async function share(e) {
     const btn = e.currentTarget;
     const url = location.href;
     const w = wings.get(current.wing);
-    const text = current.laundry ? `Laundry room at ${entrances.get(current.laundry).label}`
-      : current.floor != null ? `Wing ${w.n}, ${ordinal(current.floor)}${current.door != null ? `, door ${current.door}` : ''}` : `Wing ${w.n}`;
+    const text = current.laundry ? TEXT.laundryAt(local(entrances.get(current.laundry), 'label'))
+      : current.floor != null ? `${TEXT.wing} ${w.n}, ${ordinal(current.floor)}${current.door != null ? `, ${TEXT.doorInline} ${current.door}` : ''}` : `${TEXT.wing} ${w.n}`;
     if (navigator.share) {
       try { await navigator.share({ title: 'Wasserstadt Spindlersfeld', text, url }); return; } catch (err) { if (err && err.name === 'AbortError') return; }
     }
     try {
       await navigator.clipboard.writeText(url);
-      btn.textContent = 'Link copied';
+      btn.textContent = TEXT.copied;
+      if (btn.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) btn.animate({ scale: [0.94, 1] }, { duration: 260, easing: 'cubic-bezier(0.2, 0.75, 0.25, 1)' });
     } catch {
       const field = document.createElement('input');
       field.value = url; field.readOnly = true; field.className = 'b3d-copyfield';
@@ -233,7 +263,7 @@ function createUI(root, data) {
       const res = m ? { wing: Number(m[1]), floor: null, door: null } : parseDoor(h, data.floors.length - 1);
       if (!res.error && res.wing) select(res, 'hash');
     },
-    entranceLabel: (id) => (entrances.get(id) || {}).label || '',
+    entranceLabel: (id) => (entrances.has(id) ? local(entrances.get(id), 'label') : ''),
     wing: (n) => wings.get(n),
   };
 }
@@ -573,7 +603,7 @@ function createViewer(root, data, ui, reduceMotion) {
     b.style.setProperty('--swatch', w.color);
     b.style.setProperty('--plate-ink', w.ink);
     b.textContent = w.n;
-    b.setAttribute('aria-label', `Wing ${w.n}`);
+    b.setAttribute('aria-label', `${TEXT.wing} ${w.n}`);
     b.addEventListener('click', () => ui.select({ wing: selection.wing === w.n && selection.floor == null ? null : w.n }, 'badge'));
     labelsBox.appendChild(b);
     const box = wingBoxes.get(w.n);
@@ -599,9 +629,9 @@ function createViewer(root, data, ui, reduceMotion) {
     const el = document.createElement('button');
     el.type = 'button';
     el.className = 'b3d-pin is-laundry';
-    el.setAttribute('aria-label', `Laundry room at ${ui.entranceLabel(l.entrance)}`);
+    el.setAttribute('aria-label', TEXT.laundryAt(ui.entranceLabel(l.entrance)));
     el.setAttribute('aria-pressed', 'false');
-    el.innerHTML = `<span class="b3d-pin-hit">${pinMark('<rect x="8.3" y="6.4" width="9.4" height="11.2" rx="1.6"/><path d="M8.3 9.2h9.4"/><circle cx="13" cy="13.5" r="2.5"/>')}</span><span class="b3d-pin-label">Laundry room</span>`;
+    el.innerHTML = `<span class="b3d-pin-hit">${pinMark('<rect x="8.3" y="6.4" width="9.4" height="11.2" rx="1.6"/><path d="M8.3 9.2h9.4"/><circle cx="13" cy="13.5" r="2.5"/>')}</span><span class="b3d-pin-label">${TEXT.laundry}</span>`;
     el.addEventListener('click', () => ui.select(selection.laundry === l.entrance ? { wing: null } : { laundry: l.entrance }, 'tap'));
     labelsBox.appendChild(el);
     pins.push({ el, label: el.querySelector('.b3d-pin-label'), data: door.data, laundry: l.entrance, pos: door.pos, dx: PAIR, on: false });

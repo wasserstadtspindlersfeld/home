@@ -1,9 +1,10 @@
 {%- comment -%} Page title with the section's kicker. Expects `section` and `section_n` from find-section.html. {%- endcomment -%}
 <header class="page-head">
-  {%- assign kicker = page.kicker | default: section.kicker -%}
+  {%- if lang == 'de' -%}{%- assign section_kicker = section.de.kicker -%}{%- else -%}{%- assign section_kicker = section.kicker -%}{%- endif -%}
+  {%- assign kicker = page.kicker | default: section_kicker -%}
   {%- assign icon = page.icon | default: section.icon -%}
   {%- if kicker %}
-  <p class="kicker">{% if icon %}<span class="kicker-arch">{% include icon.html name=icon weight=2 %}</span>{% endif %}{% if section_n %}<span class="kicker-num">0{{ section_n }}</span>{% endif %}<span>{{ kicker }}</span></p>
+  <p class="kicker">{% if icon %}<span class="kicker-arch"{% if section_n %} style="view-transition-name: arch-{{ section_n }}"{% endif %}>{% include icon.html name=icon weight=2 %}</span>{% endif %}{% if section_n %}<span class="kicker-num">0{{ section_n }}</span>{% endif %}<span>{{ kicker }}</span></p>
   {%- endif %}
   <h1 class="page-title">{{ page.title }}</h1>
 </header>

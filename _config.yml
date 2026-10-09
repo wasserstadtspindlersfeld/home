@@ -32,6 +32,19 @@ defaults:
     values: { places: true }
   - scope: { path: "smart_home/smart_home_ideas.md" }
     values: { toc: true }
+  # the German pages: the same pages under de/, with lang: de
+  - scope: { path: "de" }
+    values: { lang: de }
+  - scope: { path: "de/readme.md" }
+    values: { layout: home }
+  - scope: { path: "de/maps/maps.md" }
+    values: { layout: map }
+  - scope: { path: "de/faq/faq.md" }
+    values: { accordion: true }
+  - scope: { path: "de/locations/locations.md" }
+    values: { places: true }
+  - scope: { path: "de/smart_home/smart_home_ideas.md" }
+    values: { toc: true }
 
 exclude:
   - _src

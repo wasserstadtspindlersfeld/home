@@ -21,17 +21,18 @@ layout: default
   {%- assign intro = a[0] -%}
   {%- assign rest = b[1] -%}
 {%- endif -%}
+{%- include lang.html -%}
 {%- assign img = '/assets/img/' | relative_url -%}
 <main id="main" class="home">
   <section class="home-top" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <p class="tag"><span class="tag-name">Berlin-Köpenick</span><span class="tag-district">On the Spree</span></p>
+      <p class="tag"><span class="tag-name">Berlin-Köpenick</span><span class="tag-district">{{ t.district }}</span></p>
       <h1 class="hero-title" id="hero-title"><span class="hero-pre">Wasserstadt</span> <span class="hero-main">Spindlersfeld</span></h1>
     </div>
 
     <figure class="hero-photo">
-      <img id="hero-img" src="{{ img }}hero-autumn-1200.webp" srcset="{{ img }}hero-autumn-800.webp 800w, {{ img }}hero-autumn-1200.webp 1200w, {{ img }}hero-autumn-1792.webp 1792w" sizes="(min-width: 1280px) 900px, (min-width: 1024px) calc((100vw - 64px) * 0.74), (min-width: 720px) calc((100vw - 64px) * 1.12), calc((100vw - 32px) * 1.43)" width="1792" height="1008" fetchpriority="high" alt="The Ringbau from above in autumn, with the Spree behind it">
-      <figcaption class="hero-chip"><b>1873</b>The old Spindler dye works</figcaption>
+      <img id="hero-img" src="{{ img }}hero-autumn-1200.webp" srcset="{{ img }}hero-autumn-800.webp 800w, {{ img }}hero-autumn-1200.webp 1200w, {{ img }}hero-autumn-1792.webp 1792w" sizes="(min-width: 1280px) 900px, (min-width: 1024px) calc((100vw - 64px) * 0.74), (min-width: 720px) calc((100vw - 64px) * 1.12), calc((100vw - 32px) * 1.43)" width="1792" height="1008" fetchpriority="high" alt="{{ t.hero_alt }}">
+      <figcaption class="hero-chip"><b>1873</b>{{ t.hero_chip }}</figcaption>
       <script>
         (function () {
           var d = new Date(), m = d.getMonth();
@@ -39,7 +40,7 @@ layout: default
             var i = document.getElementById('hero-img');
             i.srcset = '{{ img }}hero-winter-800.webp 800w, {{ img }}hero-winter-1200.webp 1200w, {{ img }}hero-winter-1536.webp 1536w';
             i.src = '{{ img }}hero-winter-1200.webp';
-            i.alt = 'The Ringbau from above, dressed up for Christmas';
+            i.alt = '{{ t.hero_alt_winter }}';
           }
         })();
       </script>
@@ -49,41 +50,43 @@ layout: default
 {{ intro }}
     </div>
 
-    <form class="door-finder" action="{{ '/maps/maps.html' | relative_url }}" autocomplete="off">
+    <form class="door-finder" action="{{ lp | append: '/maps/maps.html' | relative_url }}" autocomplete="off">
       <div class="finder-head">
-        <label class="finder-label" for="home-door">Find<br>a door</label>
-        <span class="arches" aria-hidden="true"><span class="arch"><b>1</b><em>Wing</em></span><span class="arch"><b>2</b><em>Floor</em></span><span class="arch"><b>3</b><em>Door</em></span></span>
+        <label class="finder-label" for="home-door">{{ t.find_door }}</label>
+        <span class="arches" aria-hidden="true"><span class="arch"><b>1</b><em>{{ t.wing }}</em></span><span class="arch"><b>2</b><em>{{ t.floor }}</em></span><span class="arch"><b>3</b><em>{{ t.door }}</em></span></span>
       </div>
       <div class="finder-row">
         <input id="home-door" name="door" inputmode="decimal" enterkeyhint="go" placeholder="1.2.3" aria-describedby="home-door-help">
-        <button type="submit" class="btn btn-round" aria-label="Show on the map">{% include icon.html name="arrow" weight=2 %}</button>
+        <button type="submit" class="btn btn-round" aria-label="{{ t.show_on_map }}">{% include icon.html name="arrow" weight=2 %}</button>
       </div>
-      <p class="finder-help" id="home-door-help">Door numbers are <b>wing.floor.door</b>, so 1.2.3 is wing 1, 2nd floor, door 3.</p>
+      <p class="finder-help" id="home-door-help">{{ t.door_help }}</p>
     </form>
   </section>
 
   <section class="guide" aria-labelledby="guide-title">
     <div class="guide-head">
-      <h2 class="guide-title" id="guide-title">The guide</h2>
-      <p class="label">{{ site.data.sections | size }} sections</p>
+      <h2 class="guide-title" id="guide-title">{{ t.guide }}</h2>
+      <p class="label">{{ site.data.sections | size }} {{ t.n_sections }}</p>
     </div>
     <nav class="bento" aria-labelledby="guide-title">
       {%- for s in site.data.sections %}{% if s.featured %}
-      <a class="tile tile-map" href="{{ s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
-        <img class="tile-img" src="{{ img }}map-preview.webp" width="1200" height="760" alt="The 3D model of the building" loading="lazy">
-        <span class="tile-badge">3D model</span>
+      {%- if lang == 'de' %}{% assign s_title = s.de.title %}{% assign s_blurb = s.de.blurb %}{% else %}{% assign s_title = s.title %}{% assign s_blurb = s.blurb %}{% endif %}
+      <a class="tile tile-map" href="{{ lp | append: s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
+        <img class="tile-img" src="{{ img }}map-preview.webp" width="1200" height="760" alt="{{ t.map_alt }}" loading="lazy">
+        <span class="tile-badge">{{ t.map_badge }}</span>
         <span class="tile-body">
-          <span class="tile-title">{{ s.title }}</span>
-          <span class="tile-blurb">{{ s.blurb }}</span>
+          <span class="tile-title">{{ s_title }}</span>
+          <span class="tile-blurb">{{ s_blurb }}</span>
         </span>
         <span class="tile-go">{% include icon.html name="arrow" weight=2 %}</span>
       </a>
       {%- endif %}{% endfor %}
       {%- for s in site.data.sections %}{% unless s.featured %}
-      <a class="tile" href="{{ s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
-        <span class="tile-arch">{% include icon.html name=s.icon weight=2 %}</span>
-        <span class="tile-title">{{ s.title }}</span>
-        <span class="tile-blurb">{{ s.blurb }}</span>
+      {%- if lang == 'de' %}{% assign s_title = s.de.title %}{% assign s_blurb = s.de.blurb %}{% else %}{% assign s_title = s.title %}{% assign s_blurb = s.blurb %}{% endif %}
+      <a class="tile" href="{{ lp | append: s.url | relative_url }}" style="--dye: {{ s.dye }}; --dye-ink: {{ s.dye_ink }}">
+        <span class="tile-arch" style="view-transition-name: arch-{{ forloop.index }}">{% include icon.html name=s.icon weight=2 %}</span>
+        <span class="tile-title">{{ s_title }}</span>
+        <span class="tile-blurb">{{ s_blurb }}</span>
         <span class="tile-go">{% include icon.html name="arrow" weight=2 %}</span>
       </a>
       {%- endunless %}{% endfor %}

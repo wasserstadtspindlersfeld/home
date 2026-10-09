@@ -1,0 +1,133 @@
+# The words around the content (menu, buttons, labels) in each language.
+# German pages live under de/ and get lang: de from _config.yml. Section names are in sections.yml,
+# and the 3D map's wing and floor names in building.yml.
+
+en:
+  name: English
+  locale: en_GB
+  description: Useful information for the residents of Wasserstadt Spindlersfeld in Berlin-Köpenick.
+  skip: Skip to content
+  home_label: Wasserstadt Spindlersfeld, home page
+  menu: Menu
+  close: Close
+  sections: Sections
+  nav_foot: Collected by residents, for residents
+  appearance: Appearance
+  system: System
+  light: Light
+  dark: Dark
+  language: Language
+  switch_to: Deutsch
+  on_this_page: On this page
+  footer_history: >-
+    The Ringbau is the former main building of the W.&nbsp;Spindler laundry and dye works, which opened here
+    on the Spree in 1873. <a href="https://de.wikipedia.org/wiki/W._Spindler">Who was Wilhelm Spindler?</a>
+  footer_contribute: >-
+    Collected by residents, for residents. Ideas and fixes are welcome by
+    <a href="mailto:spindlersfeldwasserstadt@gmail.com">email</a> or on
+    <a href="https://github.com/wasserstadtspindlersfeld/home">GitHub</a>.
+  # home page
+  district: On the Spree
+  hero_alt: The Ringbau from above in autumn, with the Spree behind it
+  hero_alt_winter: The Ringbau from above, dressed up for Christmas
+  hero_chip: The old Spindler dye works
+  find_door: Find<br>a door
+  wing: Wing
+  floor: Floor
+  door: Door
+  show_on_map: Show on the map
+  door_help: Door numbers are <b>wing.floor.door</b>, so 1.2.3 is wing 1, 2nd floor, door 3.
+  guide: The guide
+  n_sections: sections
+  map_badge: 3D model
+  map_alt: The 3D model of the building
+  # 3D map
+  b3d_title: The building in 3D
+  b3d_lead: Tap a wing, or type a door number to see its wing and floor. You can send the link to visitors.
+  b3d_canvas: 3D model of the building and its nine wings. The wing buttons below the model do the same as tapping it.
+  b3d_night: Night view
+  b3d_zoom_in: Zoom in
+  b3d_zoom_out: Zoom out
+  b3d_reset: Show the whole building
+  b3d_hint_touch: Drag to turn · pinch to zoom
+  b3d_hint_mouse: Drag to turn · hold Ctrl and scroll to zoom
+  b3d_hint_wheel: Hold Ctrl (or ⌘) and scroll to zoom
+  b3d_floors: Floor
+  b3d_pick_floor: Choose a floor
+  b3d_loading: Loading the building…
+  b3d_fallback: Your browser can’t show the 3D view. The wing buttons still work, and the flat map is further down this page.
+  b3d_empty: Tap a wing on the model, pick one of the coloured wing buttons, or type a door number.
+  b3d_find: Find a door
+  b3d_show: Show
+  b3d_help: "Door numbers are <b>wing.floor.door</b>: 1.2.3 is wing 1, 2nd floor, door 3."
+  b3d_wings: Wings
+  b3d_legend: Wing colours match the printed maps. Each one is named after a dye, a nod to the old Spindler dye works.
+  b3d_laundry: Laundry rooms
+  b3d_washers: washers
+  b3d_dryers: dryers
+  b3d_noscript: The 3D map needs JavaScript. The flat map is further down this page.
+
+de:
+  name: Deutsch
+  locale: de_DE
+  description: Nützliche Infos für alle, die in der Wasserstadt Spindlersfeld in Berlin-Köpenick wohnen.
+  skip: Zum Inhalt springen
+  home_label: Wasserstadt Spindlersfeld, Startseite
+  menu: Menü
+  close: Schließen
+  sections: Bereiche
+  nav_foot: Aus der Nachbarschaft, für die Nachbarschaft
+  appearance: Darstellung
+  system: Automatisch
+  light: Hell
+  dark: Dunkel
+  language: Sprache
+  switch_to: English
+  on_this_page: Auf dieser Seite
+  footer_history: >-
+    Der Ringbau ist das frühere Hauptgebäude der Wäscherei und Färberei W.&nbsp;Spindler, die hier an der Spree
+    1873 eröffnet wurde. <a href="https://de.wikipedia.org/wiki/W._Spindler">Wer war Wilhelm Spindler?</a>
+  footer_contribute: >-
+    Aus der Nachbarschaft, für die Nachbarschaft. Ideen und Korrekturen gern per
+    <a href="mailto:spindlersfeldwasserstadt@gmail.com">E-Mail</a> oder auf
+    <a href="https://github.com/wasserstadtspindlersfeld/home">GitHub</a>.
+  # home page
+  district: An der Spree
+  hero_alt: Der Ringbau von oben im Herbst, dahinter die Spree
+  hero_alt_winter: Der Ringbau von oben, weihnachtlich geschmückt
+  hero_chip: Die alte Spindler-Färberei
+  find_door: Tür<br>finden
+  wing: Flügel
+  floor: Etage
+  door: Tür
+  show_on_map: Auf dem Lageplan zeigen
+  door_help: Türnummern sind aufgebaut als <b>Flügel.Etage.Tür</b>, 1.2.3 ist also Flügel 1, 2. OG, Tür 3.
+  guide: Wegweiser
+  n_sections: Bereiche
+  map_badge: 3D-Modell
+  map_alt: Das 3D-Modell des Gebäudes
+  # 3D map
+  b3d_title: Das Gebäude in 3D
+  b3d_lead: Tippe auf einen Flügel oder gib eine Türnummer ein, dann siehst du Flügel und Etage. Den Link kannst du deinem Besuch schicken.
+  b3d_canvas: 3D-Modell des Gebäudes mit seinen neun Flügeln. Die Flügel-Buttons unter dem Modell funktionieren genauso wie Tippen auf das Modell.
+  b3d_night: Nachtansicht
+  b3d_zoom_in: Vergrößern
+  b3d_zoom_out: Verkleinern
+  b3d_reset: Ganzes Gebäude zeigen
+  b3d_hint_touch: Ziehen zum Drehen · mit zwei Fingern zoomen
+  b3d_hint_mouse: Ziehen zum Drehen · Strg halten und scrollen zum Zoomen
+  b3d_hint_wheel: Zum Zoomen Strg (oder ⌘) gedrückt halten und scrollen
+  b3d_floors: Etage
+  b3d_pick_floor: Etage wählen
+  b3d_loading: Das Gebäude wird geladen …
+  b3d_fallback: Dein Browser kann die 3D-Ansicht leider nicht anzeigen. Die Flügel-Buttons funktionieren trotzdem, und den flachen Lageplan findest du weiter unten.
+  b3d_empty: Tippe auf einen Flügel im Modell, wähle einen der farbigen Flügel-Buttons oder gib eine Türnummer ein.
+  b3d_find: Tür finden
+  b3d_show: Zeigen
+  b3d_help: Türnummern sind aufgebaut als <b>Flügel.Etage.Tür</b>, 1.2.3 ist also Flügel 1, 2. OG, Tür 3.
+  b3d_wings: Flügel
+  b3d_legend: Die Flügelfarben passen zu den gedruckten Plänen. Jede ist nach einem Farbstoff benannt, als Gruß an die alte Spindler-Färberei.
+  b3d_laundry: Waschräume
+  b3d_washers: Waschmaschinen
+  b3d_dryers: Trockner
+  b3d_noscript: Die 3D-Ansicht braucht JavaScript. Den flachen Lageplan findest du weiter unten.

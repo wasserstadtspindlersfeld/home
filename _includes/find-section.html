@@ -2,13 +2,14 @@
   Finds the section (from _data/sections.yml) the current page belongs to, by its first folder,
   so pages inside a section (like the heating calculator) get the section's colour too.
   Sets `section` and `section_n` (its number in the menu) for the layout that includes it.
+  Needs `path` from lang.html (German pages are the same addresses under /de).
 {%- endcomment -%}
 {%- assign section = nil -%}
 {%- assign section_n = nil -%}
-{%- assign here = page.url | split: '/' -%}
+{%- assign here = path | split: '/' -%}
 {%- for s in site.data.sections -%}
   {%- assign there = s.url | split: '/' -%}
-  {%- if s.url == page.url or there[1] == here[1] -%}
+  {%- if s.url == path or there[1] == here[1] -%}
     {%- assign section = s -%}
     {%- assign section_n = forloop.index -%}
     {%- break -%}

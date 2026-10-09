@@ -27,6 +27,13 @@ var app = new Vue( {
     }
   },
   methods: {
+    // Option names and money as the page shows them. The German page sets window.CALC_LABELS first.
+    label: function (tariff) {
+      return (window.CALC_LABELS && window.CALC_LABELS[tariff]) || tariff;
+    },
+    money: function (amount) {
+      return amount.toLocaleString(document.documentElement.lang === 'de' ? 'de-DE' : 'en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
     calculate: function () {
       // Clear Output
       this.output.CostEstimation = null;

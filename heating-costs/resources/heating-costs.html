@@ -16,7 +16,7 @@ icon: radiator
         </label>
         <label class="calc-field">
             <span class="calc-label">Wing</span>
-            <select v-model="input.Tariff"><option v-for="t in tariffs" :value="t">{{ t }}</option></select>
+            <select v-model="input.Tariff"><option v-for="t in tariffs" :value="t">{{ label(t) }}</option></select>
         </label>
     </fieldset>
 
@@ -51,7 +51,7 @@ icon: radiator
     <div><button class="btn" type="button" v-on:click="calculate">Calculate</button></div>
     <p class="calc-result" v-if="output.CostEstimation !== null" aria-live="polite">
         <template v-if="isNaN(output.CostEstimation)">Fill in all the fields above to get an estimate.</template>
-        <template v-else>Estimated costs for heating and water: <strong>{{ output.CostEstimation }} €</strong></template>
+        <template v-else>Estimated costs for heating and water: <strong>{{ money(output.CostEstimation) }} €</strong></template>
     </p>
 </div>
 {% endraw %}

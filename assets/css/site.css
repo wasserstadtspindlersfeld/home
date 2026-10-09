@@ -303,6 +303,16 @@ html:not(.js) .masthead-bar { flex-wrap: wrap; border-radius: var(--r-l); }
   transition: opacity 0.25s, visibility 0s 0.25s;
 }
 .js .site-nav[data-open="true"] { visibility: visible; opacity: 1; transition: opacity 0.25s; }
+/* links scrolled up fade out under the header's buttons instead of running into them */
+.js .site-nav::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: calc(86px + env(safe-area-inset-top, 0px));
+  background: linear-gradient(var(--paper) 78%, transparent);
+  pointer-events: none;
+}
 .nav-list { list-style: none; margin: 0; padding: 0; }
 .nav-list li { border-bottom: 1px solid var(--line); }
 .js .nav-list li { opacity: 0; translate: 0 14px; transition: opacity 0.35s, translate 0.45s var(--ease); }
@@ -354,6 +364,32 @@ html:not(.js) :is(.theme-menu, .nav-settings) { display: none; } /* the switch n
 .appearance-option:hover span { color: var(--ink); }
 .appearance-option input:checked + span { background: var(--ink); color: var(--paper); box-shadow: var(--shadow-s); }
 .appearance-option input:focus-visible + span { outline: 2px solid var(--brick); outline-offset: 2px; }
+.language { margin-top: 18px; }
+.language-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.language-options .appearance-option { color: inherit; text-decoration: none; }
+.language-options [aria-current] span { background: var(--ink); color: var(--paper); box-shadow: var(--shadow-s); }
+.language-options a:focus-visible { outline: none; }
+.language-options a:focus-visible span { outline: 2px solid var(--brick); outline-offset: 2px; }
+
+/* the language button: DE on English pages, EN on German ones */
+.lang-switch {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  color: var(--ink);
+  font: 700 0.8125rem/1 var(--font);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: background-color 0.2s, scale 0.15s;
+}
+.lang-switch:hover { background: color-mix(in srgb, var(--ink) 13%, transparent); }
+.lang-switch:active { scale: 0.92; }
 
 /* the round button in the header shows the current choice and opens the pop-up */
 .theme-button {
@@ -391,6 +427,10 @@ html[data-theme-pref="dark"] .theme-button .icon-moon { display: block; }
 }
 .theme-menu[open] .theme-panel { animation: panel-in 0.22s var(--ease); }
 @keyframes panel-in { from { opacity: 0; translate: 0 -6px; } }
+
+/* Long words never push the page sideways; German headings hyphenate (Bedienungs-anleitungen) */
+.page-title, .prose h2, .prose h3, .nav-title, .tile-title, .b3d-card-title { overflow-wrap: break-word; }
+:lang(de) :is(.page-title, .prose h2, .prose h3, .nav-title, .tile-title, .b3d-card-title, .b3d-title) { -webkit-hyphens: auto; hyphens: auto; }
 
 /* Page shell ------------------------------------------------------------------------------------ */
 .page {
@@ -496,6 +536,9 @@ html[data-theme-pref="dark"] .theme-button .icon-moon { display: block; }
 .prose table.headerless thead { display: none; }
 .prose table.headerless tbody tr:first-child > * { border-top: 0; }
 @media (max-width: 719px) {
+  .menu-toggle { justify-content: center; width: 44px; padding: 0; }
+  .menu-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .masthead-bar { gap: 8px; }
   .prose table.data, .prose table.data tbody, .prose table.data tr, .prose table.data td { display: block; }
   .prose table.data thead { display: none; }
   .prose table.data tr { padding: 12px 16px; }
@@ -569,7 +612,7 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
   transition: rotate 0.3s var(--ease), background-color 0.2s, color 0.2s;
 }
 .qa > summary:hover .icon { background: var(--dye); color: var(--dye-ink); }
-.qa[open] > summary .icon { rotate: 0deg; background: var(--dye); color: var(--dye-ink); }
+.qa[open]:not(.is-closing) > summary .icon { rotate: 0deg; background: var(--dye); color: var(--dye-ink); }
 .qa-body { padding: 2px 18px 6px; }
 .qa-body .facts, .qa-body img, .qa-body video { margin-top: 6px; }
 
@@ -1085,7 +1128,7 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
   font: 700 1.0625rem/1 var(--font-display);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: translate 0.25s var(--ease), box-shadow 0.2s;
+  transition: translate 0.25s var(--ease), box-shadow 0.2s, scale 0.15s;
 }
 .b3d-chip:hover { translate: 0 -2px; }
 .b3d-chip:active { translate: 0 0; }
@@ -1123,8 +1166,13 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
   .b3d-places-label { grid-column: 1 / -1; }
 }
 
-/* Motion: the hero rises in; sections and tiles rise as they scroll into view ---------------------- */
+/* Motion ---------------------------------------------------------------------------------------------
+   One quiet language everywhere: things ease out, nothing bounces, nothing takes much longer than a
+   third of a second, and all of it switches off when the phone or computer asks for reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+
+  /* the hero rises in; sections and tiles rise as they scroll into view */
   .hero-title > span, .hero-photo, .tag { animation: rise 0.9s var(--ease) both; }
   .hero-main { animation-delay: 0.08s; }
   .hero-photo { animation-delay: 0.16s; }
@@ -1137,7 +1185,42 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
     }
     @keyframes reveal { from { opacity: 0; translate: 0 34px; scale: 0.985; } }
   }
+  /* the header bar gains a little depth once the page scrolls under it */
+  @supports (animation-timeline: scroll()) {
+    .masthead-bar::before { animation: bar-lift linear both; animation-timeline: scroll(root); animation-range: 0 140px; }
+    @keyframes bar-lift { to { box-shadow: var(--shadow); } }
+  }
+
+  /* Page to page: the page settles in while the header stays still, and a section's arched icon
+     flies from its tile on the home page into the page title (and back). Only main is its own
+     layer: a layer around the header would stop its glass from blurring the page behind it. */
+  @view-transition { navigation: auto; }
+  main { view-transition-name: page; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.25s; }
+  ::view-transition-group(page) { animation: none; }
+  ::view-transition-old(page) { animation: 0.16s ease-in both vt-out; }
+  ::view-transition-new(page) { animation: 0.36s var(--ease) both vt-in; }
+  ::view-transition-group(*) { animation-duration: 0.42s; animation-timing-function: var(--ease); }
+  @keyframes vt-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; translate: 0 12px; } }
+  /* switching light and dark: one soft cross-fade of the whole page */
+  html.vt-theme::view-transition-old(root) { animation: 0.32s ease both vt-out; }
+  html.vt-theme::view-transition-new(root) { animation: 0.32s ease both vt-fade; }
+  html.vt-theme::view-transition-old(page), html.vt-theme::view-transition-new(page) { animation: none; }
+  @keyframes vt-fade { from { opacity: 0; } }
+
+  /* things that appear: the map's floor picker, a wrong door number nudges */
+  .b3d-floors:not([hidden]) { animation: pop-in 0.3s var(--ease); }
+  @keyframes pop-in { from { opacity: 0; translate: 0 8px; scale: 0.98; } }
+  .door-finder.has-error .finder-row, .b3d-finder.has-error .b3d-finder-row { animation: nudge 0.4s var(--ease); }
+  @keyframes nudge { 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
 }
+
+/* presses answer the finger right away (phones have no hover) */
+.qa > summary { transition: background-color 0.15s; }
+.qa > summary:active, a.fact:active, .docs a:active { background: var(--card-2); }
+.b3d-chip:active, .b3d-place:active, .prose ul.jumps a:active, .prose a.cta:active { scale: 0.96; }
+.b3d-place, .prose ul.jumps a, .prose a.cta { transition-property: background-color, color, border-color, box-shadow, scale; transition-duration: 0.2s; }
 
 /* Wider screens ------------------------------------------------------------------------------------- */
 @media (min-width: 720px) {
@@ -1157,6 +1240,7 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
 
 @media (min-width: 1024px) {
   .menu-toggle { display: none; }
+  .js .site-nav::before { content: none; }
   .js .site-nav, .site-nav {
     position: static;
     display: block;
@@ -1173,7 +1257,8 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
   .nav-link { display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 999px; color: var(--ink-2); transition: background-color 0.2s, color 0.2s; }
   .nav-link:hover { background: var(--card-2); color: var(--ink); }
   .nav-num, .nav-blurb, .nav-link > .icon, .nav-foot, .nav-settings { display: none; }
-  .theme-menu { order: 1; } /* after the links */
+  .lang-switch { order: 1; } /* after the links */
+  .theme-menu { order: 2; }
   .nav-title { font: 500 0.9375rem/1 var(--font); letter-spacing: 0; gap: 8px; white-space: nowrap; }
   .nav-title::after { order: -1; width: 8px; height: 9px; border-radius: 4px 4px 1.5px 1.5px; }
   .nav-link[aria-current="page"] { background: var(--ink); color: var(--paper); }
@@ -1237,6 +1322,8 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
 @media (min-width: 1024px) and (max-width: 1199px) {
   .brand-pre { display: none; }
   .nav-link { padding: 0 10px; }
+  :lang(de) .nav-link { padding: 0 8px; }
+  :lang(de) .nav-title { gap: 6px; }
 }
 @media (min-width: 1200px) { /* the door finder is a tall tile beside the photo: bigger sign */
   .door-finder .finder-label { font-size: 2.5rem; }
@@ -1246,5 +1333,6 @@ a.fact:hover .fact-act { background: var(--brick); color: var(--on-brick); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }

@@ -1,25 +1,42 @@
+{%- if lang == 'de' -%}{%- assign other = 'en' -%}{%- else -%}{%- assign other = 'de' -%}{%- endif -%}
 <header class="masthead">
   <div class="masthead-bar">
-    <a class="brand" href="{{ '/' | relative_url }}" aria-label="Wasserstadt Spindlersfeld, home page">
+    <a class="brand" href="{{ lp | append: '/' | relative_url }}" aria-label="{{ t.home_label }}">
       {% include symbol.html %}
       <span class="brand-name"><span class="brand-pre">Wasserstadt </span>Spindlersfeld</span>
     </a>
+    <a class="lang-switch" href="{{ other_url | relative_url }}" hreflang="{{ other }}" lang="{{ other }}" title="{{ t.switch_to }}" data-lang-switch><span aria-hidden="true">{{ other | upcase }}</span><span class="sr-only">{{ t.switch_to }}</span></a>
     <details class="theme-menu">
-      <summary class="theme-button" aria-label="Appearance">{% include icon.html name="system" weight=2 %}{% include icon.html name="sun" weight=2 %}{% include icon.html name="moon" weight=2 %}</summary>
+      <summary class="theme-button" aria-label="{{ t.appearance }}">{% include icon.html name="system" weight=2 %}{% include icon.html name="sun" weight=2 %}{% include icon.html name="moon" weight=2 %}</summary>
       <div class="theme-panel">{% include appearance.html id="top" %}</div>
     </details>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-      <span class="menu-word"><span class="menu-open">Menu</span><span class="menu-close">Close</span></span>
+      <span class="menu-word"><span class="menu-open">{{ t.menu }}</span><span class="menu-close">{{ t.close }}</span></span>
       <span class="menu-icon" aria-hidden="true"><i></i><i></i></span>
     </button>
-    <nav id="site-nav" class="site-nav" aria-label="Sections" data-open="false">
+    <nav id="site-nav" class="site-nav" aria-label="{{ t.sections }}" data-open="false">
       <ul class="nav-list">
         {%- for s in site.data.sections %}
-        <li style="--i: {{ forloop.index }}; --dye: {{ s.dye }}"><a class="nav-link" href="{{ s.url | relative_url }}"{% if page.url == s.url %} aria-current="page"{% endif %}><span class="nav-num">0{{ forloop.index }}</span><span class="nav-title">{{ s.title }}</span><span class="nav-blurb">{{ s.blurb }}</span>{% include icon.html name="arrow" weight=2 %}</a></li>
+        {%- if lang == 'de' %}{% assign s_title = s.de.title %}{% assign s_blurb = s.de.blurb %}{% else %}{% assign s_title = s.title %}{% assign s_blurb = s.blurb %}{% endif %}
+        <li style="--i: {{ forloop.index }}; --dye: {{ s.dye }}"><a class="nav-link" href="{{ lp | append: s.url | relative_url }}"{% if path == s.url %} aria-current="page"{% endif %}><span class="nav-num">0{{ forloop.index }}</span><span class="nav-title">{{ s_title }}</span><span class="nav-blurb">{{ s_blurb }}</span>{% include icon.html name="arrow" weight=2 %}</a></li>
         {%- endfor %}
       </ul>
-      <div class="nav-settings">{% include appearance.html id="sheet" %}</div>
-      <p class="nav-foot">Collected by residents, for residents</p>
+      <div class="nav-settings">
+        {% include appearance.html id="sheet" %}
+        <div class="language" role="group" aria-labelledby="language-label">
+          <p class="appearance-label" id="language-label">{{ t.language }}</p>
+          <div class="appearance-options language-options">
+            {%- for code in site.data.i18n %}{% assign l = code[0] %}
+            {%- if l == lang %}
+            <span class="appearance-option" aria-current="true" lang="{{ l }}"><span>{{ site.data.i18n[l].name }}</span></span>
+            {%- else %}
+            <a class="appearance-option" href="{{ other_url | relative_url }}" hreflang="{{ l }}" lang="{{ l }}" data-lang-switch><span>{{ site.data.i18n[l].name }}</span></a>
+            {%- endif %}
+            {%- endfor %}
+          </div>
+        </div>
+      </div>
+      <p class="nav-foot">{{ t.nav_foot }}</p>
     </nav>
   </div>
 </header>

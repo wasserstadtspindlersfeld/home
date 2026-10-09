@@ -1,63 +1,64 @@
 {%- comment -%} Interactive 3D map. Script: assets/js/building-3d.js (built from _src/building-3d). Text: _data/building.yml {%- endcomment -%}
 <section id="building-3d" class="b3d" data-state="loading" aria-labelledby="b3d-title">
   <div class="b3d-intro">
-    <h2 class="b3d-title" id="b3d-title">The building in 3D</h2>
-    <p class="b3d-lead">Tap a wing, or type a door number to see its wing and floor. You can send the link to visitors.</p>
+    <h2 class="b3d-title" id="b3d-title">{{ t.b3d_title }}</h2>
+    <p class="b3d-lead">{{ t.b3d_lead }}</p>
   </div>
 
   <div class="b3d-stage">
     <script>try { var s = localStorage.getItem('map-scene'); if (s === 'day' || s === 'night') document.currentScript.parentNode.dataset.scene = s; } catch (e) {}</script>
-    <canvas class="b3d-canvas" role="img" aria-label="3D model of the building and its nine wings. The wing buttons below the model do the same as tapping it."></canvas>
+    <canvas class="b3d-canvas" role="img" aria-label="{{ t.b3d_canvas }}"></canvas>
     <div class="b3d-labels"></div>
     <div class="b3d-compass" aria-hidden="true">
       <span class="b3d-compass-needle"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2.5 15.5 12h-7z" fill="currentColor"/><path d="M12 21.5 8.5 12h7z" fill="currentColor" opacity=".3"/></svg><span class="b3d-compass-n">N</span></span>
     </div>
-    <button type="button" class="b3d-tool b3d-scene" aria-pressed="false" aria-label="Night view" title="Night view">{% include icon.html name="moon" weight=2 %}</button>
+    <button type="button" class="b3d-tool b3d-scene" aria-pressed="false" aria-label="{{ t.b3d_night }}" title="{{ t.b3d_night }}">{% include icon.html name="moon" weight=2 %}</button>
     <div class="b3d-tools">
-      <button type="button" class="b3d-tool b3d-zoom" data-dir="in" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
-      <button type="button" class="b3d-tool b3d-zoom" data-dir="out" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/></svg></button>
-      <button type="button" class="b3d-tool b3d-reset" aria-label="Show the whole building">{% include icon.html name="reset" %}</button>
+      <button type="button" class="b3d-tool b3d-zoom" data-dir="in" aria-label="{{ t.b3d_zoom_in }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></button>
+      <button type="button" class="b3d-tool b3d-zoom" data-dir="out" aria-label="{{ t.b3d_zoom_out }}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/></svg></button>
+      <button type="button" class="b3d-tool b3d-reset" aria-label="{{ t.b3d_reset }}">{% include icon.html name="reset" %}</button>
     </div>
     <p class="b3d-hint" data-show="">
-      <span class="b3d-hint-touch">Drag to turn · pinch to zoom</span>
-      <span class="b3d-hint-mouse">Drag to turn · hold Ctrl and scroll to zoom</span>
-      <span class="b3d-hint-wheel">Hold Ctrl (or ⌘) and scroll to zoom</span>
+      <span class="b3d-hint-touch">{{ t.b3d_hint_touch }}</span>
+      <span class="b3d-hint-mouse">{{ t.b3d_hint_mouse }}</span>
+      <span class="b3d-hint-wheel">{{ t.b3d_hint_wheel }}</span>
     </p>
     <div class="b3d-floors" hidden>
-      <span class="b3d-floors-label">Floor</span>
-      <div class="b3d-floors-steps" role="group" aria-label="Choose a floor"></div>
+      <span class="b3d-floors-label">{{ t.b3d_floors }}</span>
+      <div class="b3d-floors-steps" role="group" aria-label="{{ t.b3d_pick_floor }}"></div>
     </div>
-    <p class="b3d-loading">Loading the building…</p>
-    <p class="b3d-fallback">Your browser can’t show the 3D view. The wing buttons still work, and the flat map is further down this page.</p>
+    <p class="b3d-loading">{{ t.b3d_loading }}</p>
+    <p class="b3d-fallback">{{ t.b3d_fallback }}</p>
   </div>
 
   <div class="b3d-card" aria-live="polite" data-state="empty">
-    <p class="b3d-empty">Tap a wing on the model, pick one of the coloured wing buttons, or type a door number.</p>
+    <p class="b3d-empty">{{ t.b3d_empty }}</p>
   </div>
 
   <form class="b3d-finder" autocomplete="off">
-    <label class="b3d-label" for="b3d-door">Find a door</label>
+    <label class="b3d-label" for="b3d-door">{{ t.b3d_find }}</label>
     <div class="b3d-finder-row">
       <input id="b3d-door" name="door" inputmode="decimal" enterkeyhint="search" placeholder="1.2.3" aria-describedby="b3d-help">
-      <button type="submit" class="btn">Show</button>
+      <button type="submit" class="btn">{{ t.b3d_show }}</button>
     </div>
-    <p class="b3d-help" id="b3d-help">Door numbers are <b>wing.floor.door</b>: 1.2.3 is wing 1, 2nd floor, door 3.</p>
+    <p class="b3d-help" id="b3d-help">{{ t.b3d_help }}</p>
   </form>
 
-  <div class="b3d-wings" role="group" aria-label="Wings"></div>
-  <p class="b3d-legend">Wing colours match the printed maps. Each one is named after a dye, a nod to the old Spindler dye works.</p>
+  <div class="b3d-wings" role="group" aria-label="{{ t.b3d_wings }}"></div>
+  <p class="b3d-legend">{{ t.b3d_legend }}</p>
   {%- assign rooms = site.data.building.laundry %}
   {%- if rooms.size > 0 %}
   <div class="b3d-places" role="group" aria-labelledby="b3d-laundry-label">
-    <p class="b3d-places-label" id="b3d-laundry-label">Laundry rooms</p>
+    <p class="b3d-places-label" id="b3d-laundry-label">{{ t.b3d_laundry }}</p>
     {%- for l in rooms %}
     {%- assign e = site.data.building.entrances | where: "id", l.entrance | first %}
-    <button type="button" class="b3d-place" data-laundry="{{ l.entrance }}" aria-pressed="false"><span class="b3d-place-icon">{% include icon.html name="washer" weight=2 %}</span><span class="b3d-place-text"><span class="b3d-place-title">{{ e.label }}</span><span class="b3d-place-sub">{{ l.washers }} washers · {{ l.dryers }} dryers{% if l.vending.size > 0 %} · {{ l.vending | join: ", " | downcase }}{% endif %}</span></span></button>
+    {%- if lang == 'de' %}{% assign vending = l.de.vending | join: ", " %}{% else %}{% assign vending = l.vending | join: ", " | downcase %}{% endif %}
+    <button type="button" class="b3d-place" data-laundry="{{ l.entrance }}" aria-pressed="false"><span class="b3d-place-icon">{% include icon.html name="washer" weight=2 %}</span><span class="b3d-place-text"><span class="b3d-place-title">{% if lang == 'de' and e.de.label %}{{ e.de.label }}{% else %}{{ e.label }}{% endif %}</span><span class="b3d-place-sub">{{ l.washers }} {{ t.b3d_washers }} · {{ l.dryers }} {{ t.b3d_dryers }}{% if l.vending.size > 0 %} · {{ vending }}{% endif %}</span></span></button>
     {%- endfor %}
   </div>
   {%- endif %}
 
   <script type="application/json" id="b3d-data">{{ site.data.building | jsonify }}</script>
-  <noscript><p class="b3d-noscript">The 3D map needs JavaScript. The flat map is further down this page.</p></noscript>
+  <noscript><p class="b3d-noscript">{{ t.b3d_noscript }}</p></noscript>
 </section>
 <script type="module" src="{{ '/assets/js/building-3d.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

@@ -14,8 +14,18 @@ const ICONS = {
   chevron: '<path d="m6 9.5 6 6 6-6"/>',
   calculator: '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01"/>',
 };
+// Motion follows the phone or computer: none at all when it asks for reduced motion
+const motionOK = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = 'cubic-bezier(0.2, 0.75, 0.25, 1)';
+
 const icon = (name) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+
+// The few words this script adds to a page, in the page's language
+const WORDS = {
+  en: { call: 'Call', email: 'Email', calendar: 'Calendar', pdf: 'PDF', map: 'Map', open: 'Open', calculator: 'Open the calculator' },
+  de: { call: 'Anrufen', email: 'E-Mail', calendar: 'Kalender', pdf: 'PDF', map: 'Karte', open: 'Öffnen', calculator: 'Zum Rechner' },
+}[document.documentElement.lang === 'de' ? 'de' : 'en'];
 
 // Menu button (phones): a full-screen sheet; the page behind it doesn't scroll
 const toggle = document.querySelector('.menu-toggle');
@@ -53,10 +63,19 @@ setTheme(THEMES.includes(savedTheme()) ? savedTheme() : 'system');
 document.querySelectorAll('[data-appearance]').forEach((group) => group.addEventListener('change', (e) => {
   const pref = e.target.value;
   try { if (pref === 'system') localStorage.removeItem('theme'); else localStorage.setItem('theme', pref); } catch { /* private mode: still switch this page */ }
-  setTheme(pref);
+  // one soft cross-fade between light and dark, where the browser can
+  if (!document.startViewTransition || !motionOK()) { setTheme(pref); return; }
+  root.classList.add('vt-theme');
+  document.startViewTransition(() => setTheme(pref)).finished.finally(() => root.classList.remove('vt-theme'));
 }));
 window.addEventListener('storage', (e) => { if (e.key === 'theme') setTheme(THEMES.includes(e.newValue) ? e.newValue : 'system'); });
 window.addEventListener('pageshow', (e) => { if (e.persisted) setTheme(THEMES.includes(savedTheme()) ? savedTheme() : 'system'); });
+
+// Switching language keeps your place: an open question or a door number on the map has the
+// same #address in both languages
+document.querySelectorAll('[data-lang-switch]').forEach((a) => a.addEventListener('click', () => {
+  if (location.hash) a.href = a.href.split('#')[0] + location.hash;
+}));
 
 // The appearance pop-up in the header closes after a tap on a choice, a tap outside, or Escape
 const themeMenu = document.querySelector('.theme-menu');
@@ -75,12 +94,12 @@ if (themeMenu) {
 // What a link in a fact row does, and how its value reads best
 function actionFor(a) {
   const href = a.getAttribute('href') || '';
-  if (href.startsWith('tel:')) return { label: 'Call', icon: 'phone' };
-  if (href.startsWith('mailto:')) return { label: 'Email', icon: 'mail' };
-  if (/\.ics($|\?)/i.test(href)) return { label: 'Calendar', icon: 'calendar' };
-  if (/\.pdf($|\?)/i.test(href)) return { label: 'PDF', icon: 'doc' };
-  if (/maps\.app\.goo\.gl|google\.[a-z.]+\/maps|maps\.apple/.test(href)) return { label: 'Map', icon: 'pin' };
-  return { label: 'Open', icon: 'external' };
+  if (href.startsWith('tel:')) return { label: WORDS.call, icon: 'phone' };
+  if (href.startsWith('mailto:')) return { label: WORDS.email, icon: 'mail' };
+  if (/\.ics($|\?)/i.test(href)) return { label: WORDS.calendar, icon: 'calendar' };
+  if (/\.pdf($|\?)/i.test(href)) return { label: WORDS.pdf, icon: 'doc' };
+  if (/maps\.app\.goo\.gl|google\.[a-z.]+\/maps|maps\.apple/.test(href)) return { label: WORDS.map, icon: 'pin' };
+  return { label: WORDS.open, icon: 'external' };
 }
 function tidyValue(a) {
   const text = a.textContent.trim();
@@ -111,7 +130,7 @@ document.querySelectorAll('.prose table').forEach((table) => {
         a.innerHTML = `<span class="fact-k"></span><span class="fact-v"></span><span class="fact-act">${icon(act.icon)}${act.label}</span>`;
         // a link that only says "Download" or shows a file name reads better as its label
         const text = link.textContent.trim();
-        const fileLike = /\.(pdf|ics|mp4|zip)$/i.test(text) || /^(download|link|open|here)$/i.test(text);
+        const fileLike = /\.(pdf|ics|mp4|zip)$/i.test(text) || /^(download|link|open|here|herunterladen|öffnen|hier)$/i.test(text);
         a.querySelector('.fact-k').textContent = fileLike ? '' : label;
         a.querySelector('.fact-v').textContent = fileLike ? label : tidyValue(link);
         li.appendChild(a);
@@ -160,11 +179,11 @@ document.querySelectorAll('.prose ul').forEach((ul) => {
 
 // The calculator link becomes a button
 document.querySelectorAll('.prose a[href$="heating-costs.html"]').forEach((a) => {
-  if (!/calculator/i.test(a.textContent)) return;
+  if (!/calculator|rechner/i.test(a.textContent)) return;
   a.classList.add('cta');
   const li = a.closest('li');
   if (li) li.classList.add('cta-item');
-  a.textContent = 'Open the calculator';
+  a.textContent = WORDS.calculator;
   a.insertAdjacentHTML('afterbegin', icon('calculator'));
 });
 
@@ -202,6 +221,31 @@ if (document.querySelector('[data-accordion]')) {
     summary.insertAdjacentHTML('beforeend', icon('chevron'));
     details.append(summary, body);
   });
+  // answers unfold and fold instead of jumping open and shut
+  if (motionOK()) {
+    prose.querySelectorAll('details.qa').forEach((d) => {
+      const summary = d.querySelector('summary');
+      const body = d.querySelector('.qa-body');
+      let anim = null;
+      summary.addEventListener('click', (e) => {
+        e.preventDefault();
+        const from = d.offsetHeight;
+        if (anim) anim.cancel();
+        if (d.open && !d.classList.contains('is-closing')) {
+          d.classList.add('is-closing');
+          const to = summary.offsetHeight + (d.offsetHeight - d.clientHeight); // keeps the border
+          anim = d.animate({ height: [`${from}px`, `${to}px`] }, { duration: 260, easing: EASE });
+          anim.onfinish = () => { d.open = false; d.classList.remove('is-closing'); anim = null; };
+        } else {
+          d.classList.remove('is-closing');
+          d.open = true;
+          anim = d.animate({ height: [`${from}px`, `${d.offsetHeight}px`] }, { duration: 340, easing: EASE });
+          body.animate({ opacity: [0, 1], transform: ['translateY(-6px)', 'none'] }, { duration: 340, easing: EASE });
+          anim.onfinish = () => { anim = null; };
+        }
+      });
+    });
+  }
   const openFromHash = () => {
     const target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
     const details = target && target.closest('details');

@@ -27,6 +27,13 @@ var app = new Vue( {
     }
   },
   methods: {
+    // Option names and money as the page shows them. The German page sets window.CALC_LABELS first.
+    label: function (tariff) {
+      return (window.CALC_LABELS && window.CALC_LABELS[tariff]) || tariff;
+    },
+    money: function (amount) {
+      return amount.toLocaleString(document.documentElement.lang === 'de' ? 'de-DE' : 'en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
     calculate: function () {
       // Clear Output
       this.output.CostEstimation = null;
@@ -34,11 +41,13 @@ var app = new Vue( {
       // Inputs
       const year = this.input.Year;
       const tariff = this.input.Tariff;
-      const livingArea = parseFloat(this.input.LivingArea);
-      const heatingArea = parseFloat(this.input.HeatingArea);
-      const heatingUnits = parseFloat(this.input.HeatingUnits);
-      const warmWater = parseFloat(this.input.WarmWater);
-      const coldWater = parseFloat(this.input.ColdWater);
+      // Accept German decimal commas too ("62,5")
+      const toNumber = (value) => parseFloat(String(value).replace(',', '.'));
+      const livingArea = toNumber(this.input.LivingArea);
+      const heatingArea = toNumber(this.input.HeatingArea);
+      const heatingUnits = toNumber(this.input.HeatingUnits);
+      const warmWater = toNumber(this.input.WarmWater);
+      const coldWater = toNumber(this.input.ColdWater);
 
       let pricePerUnit = undefined;
       if (tariff === 'Average tariff') {

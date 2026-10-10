@@ -1,0 +1,11 @@
+<footer class="site-footer">
+  <div class="dye-strip" aria-hidden="true">{% for w in site.data.building.wings %}<i style="--c: {{ w.color }}"></i>{% endfor %}</div>
+  <div class="footer-inner">
+    <p class="footer-brand">{% include symbol.html class="symbol-s" %}<span>Wasserstadt Spindlersfeld</span></p>
+    <div class="footer-text">
+      <p>{{ t.footer_history }}</p>
+      <p>{{ t.footer_contribute }}</p>
+    </div>
+  </div>
+  <p class="footer-mark" aria-hidden="true">Spindlersfeld</p>
+</footer>

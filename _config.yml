@@ -1,0 +1,56 @@
+# Site settings for GitHub Pages (Jekyll).
+title: Wasserstadt Spindlersfeld
+description: Useful information for the residents of Wasserstadt Spindlersfeld in Berlin-Köpenick.
+url: https://wasserstadtspindlersfeld.github.io
+baseurl: /home   # change to "" if the site ever moves to its own domain
+lang: en
+theme: null      # the design lives in _layouts, _includes and assets/css/site.css
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-titles-from-headings
+  - jekyll-default-layout
+
+relative_links:
+  enabled: true
+titles_from_headings:
+  enabled: true
+  strip_title: true   # the layout prints the page title itself
+
+defaults:
+  - scope: { path: "" }
+    values: { layout: page }
+  - scope: { path: "readme.md" }
+    values: { layout: home }
+  - scope: { path: "maps/maps.md" }
+    values: { layout: map }
+  - scope: { path: "faq/faq.md" }
+    values: { accordion: true }
+  - scope: { path: "locations/locations.md" }
+    values: { places: true }
+  - scope: { path: "smart_home/smart_home_ideas.md" }
+    values: { toc: true }
+  # the German pages: the same pages under de/, with lang: de
+  - scope: { path: "de" }
+    values: { lang: de }
+  - scope: { path: "de/readme.md" }
+    values: { layout: home }
+  - scope: { path: "de/maps/maps.md" }
+    values: { layout: map }
+  - scope: { path: "de/faq/faq.md" }
+    values: { accordion: true }
+  - scope: { path: "de/locations/locations.md" }
+    values: { places: true }
+  - scope: { path: "de/smart_home/smart_home_ideas.md" }
+    values: { toc: true }
+
+exclude:
+  - _src
+  - package.json
+  - package-lock.json
+  - node_modules
+  - Gemfile
+  - Gemfile.lock
+  - vendor

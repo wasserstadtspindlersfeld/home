@@ -1,6 +1,8 @@
+<!-- site:hide -->
 # Wasserstadt Spindlersfeld
 
 ![Building](locations/resources/building_spring.png)
+<!-- /site:hide -->
 
 ## Welcome
 
@@ -8,6 +10,7 @@ Hello everyone,
 
 This is a place where some information is collected and shared with the residents of Wasserstadt Spindlersfeld.
 
+<!-- site:sections -->
 Table of contents
 - [Frequently Asked Questions](./faq/faq.md)
 - [Contacts](./contacts/contacts.md)
@@ -17,6 +20,8 @@ Table of contents
 - [User manuals](./manuals/manuals.md)
 - [Smart Home Solutions](./smart_home/smart_home_ideas.md)
 
+<!-- /site:sections -->
+
 Additional information
 - [Who was Wilhelm Spindler?](https://de.wikipedia.org/wiki/W._Spindler)
 
@@ -25,7 +30,7 @@ Additional information
 You can add this page to your home screen to make it easily accessible.
 
 ### iOS
-1. Tap the Share button <img src="https://cdsassets.apple.com/live/7WUAS350/images/ios-apps/keynote/ios13-iwork-share-icon.png" alt="share_button" width="10"/> in the menu bar.
+1. Tap the Share button <img src="resources/ios-share-icon.svg" alt="share_button" width="10"/> in the menu bar.
 2. Scroll down the list of options, then tap Add to Home Screen.
 > If you don’t see Add to Home Screen, you can add it. Scroll down to the bottom of the list, tap Edit Actions, then tap  Add to Home Screen.
 

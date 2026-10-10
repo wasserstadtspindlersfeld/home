@@ -1,0 +1,63 @@
+# The sections shown in the menu and on the home page, in menu order.
+# title: menu name, url: page address, icon: name from _includes/icon.html,
+# kicker: small label above the page title, blurb: one line for the home page.
+# dye: the section's colour, one of the historic dyes the wings are named after
+# (see _data/building.yml); dye_ink: a text colour that stays readable on it.
+# de: the German title, kicker and blurb (the German pages are the same addresses under /de).
+- title: FAQ
+  url: /faq/faq.html
+  icon: faq
+  kicker: Questions and answers
+  blurb: Painting, garbage days, heating, moving big things
+  dye: "#E2BE34"
+  dye_ink: "#2b2106"
+  de: { title: FAQ, kicker: Fragen und Antworten, blurb: "Streichen, Mülltage, Heizung, Sperriges transportieren" }
+- title: Contacts
+  url: /contacts/contacts.html
+  icon: phone
+  kicker: Who to call
+  blurb: Bock Hausservice, Hilpert Hausverwaltung, ROMI
+  dye: "#C8463D"
+  dye_ink: "#ffffff"
+  de: { title: Kontakte, kicker: Wer zuständig ist, blurb: "Bock Hausservice, Hilpert Hausverwaltung, ROMI" }
+- title: Nearby
+  url: /locations/locations.html
+  icon: pin
+  kicker: Around the corner
+  blurb: Doctors, vets, printing, recycling
+  dye: "#2E9A84"
+  dye_ink: "#ffffff"
+  de: { title: In der Nähe, kicker: Gleich um die Ecke, blurb: "Ärzte, Tierärzte, Drucken, Recycling" }
+- title: Heating costs
+  url: /heating-costs/heating-costs.html
+  icon: radiator
+  kicker: Your yearly bill
+  blurb: How heating and water are billed, plus a calculator
+  dye: "#E8892B"
+  dye_ink: "#2b1606"
+  de: { title: Heizkosten, kicker: Deine Jahresabrechnung, blurb: "So werden Heizung und Wasser abgerechnet, mit Rechner" }
+- title: Maps
+  url: /maps/maps.html
+  icon: map
+  kicker: Finding your way
+  blurb: Find any wing, floor, entrance or laundry room in 3D
+  featured: true
+  dye: "#4F82C0"
+  dye_ink: "#ffffff"
+  de: { title: Lagepläne, kicker: Orientierung, blurb: "Jeden Flügel, jede Etage, jeden Eingang und die Waschräume in 3D finden" }
+- title: Manuals
+  url: /manuals/manuals.html
+  icon: book
+  kicker: Appliances
+  blurb: Washing machine, fridge, microwave, video phone, AC
+  dye: "#8E4FA0"
+  dye_ink: "#ffffff"
+  de: { title: Anleitungen, kicker: Haushaltsgeräte, blurb: "Waschmaschine, Kühlschrank, Mikrowelle, Gegensprechanlage, Klimaanlage" }
+- title: Smart home
+  url: /smart_home/smart_home_ideas.html
+  icon: camera
+  kicker: Ideas
+  blurb: Camera and door sensor kits for your apartment
+  dye: "#D2378F"
+  dye_ink: "#ffffff"
+  de: { title: Smart Home, kicker: Ideen, blurb: "Kameras und Türsensoren für deine Wohnung" }

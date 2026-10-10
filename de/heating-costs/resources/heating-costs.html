@@ -1,0 +1,73 @@
+---
+title: Heiz- und Wasserkosten schätzen
+kicker: Deine Jahresabrechnung
+icon: radiator
+---
+{% raw %}
+<div id="app" class="calc">
+    <p>Grundlage sind die Abrechnungen der Vorjahre. Denk daran, dass sich die Preise jedes Jahr ändern, und meistens steigen sie.</p>
+    <p>Die Betriebskosten sind hier nicht enthalten.</p>
+
+    <fieldset>
+        <legend>Tarif</legend>
+        <label class="calc-field">
+            <span class="calc-label">Jahr</span>
+            <select v-model="input.Year"><option v-for="y in years" :value="y">{{ y }}</option></select>
+        </label>
+        <label class="calc-field">
+            <span class="calc-label">Flügel</span>
+            <select v-model="input.Tariff"><option v-for="t in tariffs" :value="t">{{ label(t) }}</option></select>
+        </label>
+    </fieldset>
+
+    <fieldset>
+        <legend>Deine Wohnung</legend>
+        <label class="calc-field">
+            <span class="calc-label">Wohnfläche</span>
+            <span class="calc-input"><input v-model="input.LivingArea" type="text" inputmode="decimal"/><span class="calc-unit">m²</span></span>
+        </label>
+        <label class="calc-field">
+            <span class="calc-label">Heizfläche <small>Wohnfläche ohne Balkon oder Terrasse</small></span>
+            <span class="calc-input"><input v-model="input.HeatingArea" type="text" inputmode="decimal"/><span class="calc-unit">m²</span></span>
+        </label>
+    </fieldset>
+
+    <fieldset>
+        <legend>Dein Verbrauch</legend>
+        <label class="calc-field">
+            <span class="calc-label">Heizung</span>
+            <span class="calc-input"><input v-model="input.HeatingUnits" type="text" inputmode="decimal"/><span class="calc-unit">kWh</span></span>
+        </label>
+        <label class="calc-field">
+            <span class="calc-label">Warmwasser</span>
+            <span class="calc-input"><input v-model="input.WarmWater" type="text" inputmode="decimal"/><span class="calc-unit">m³</span></span>
+        </label>
+        <label class="calc-field">
+            <span class="calc-label">Kaltwasser</span>
+            <span class="calc-input"><input v-model="input.ColdWater" type="text" inputmode="decimal"/><span class="calc-unit">m³</span></span>
+        </label>
+    </fieldset>
+
+    <div><button class="btn" type="button" v-on:click="calculate">Berechnen</button></div>
+    <p class="calc-result" v-if="output.CostEstimation !== null" aria-live="polite">
+        <template v-if="isNaN(output.CostEstimation)">Füll bitte alle Felder oben aus, dann bekommst du eine Schätzung.</template>
+        <template v-else>Geschätzte Kosten für Heizung und Wasser: <strong>{{ money(output.CostEstimation) }} €</strong></template>
+    </p>
+</div>
+{% endraw %}
+<script>
+  // The calculator's options as this page shows them (calculator.js keeps the English names as keys)
+  window.CALC_LABELS = {
+    'Average tariff': 'Durchschnitt aller Flügel',
+    'Worst tariff': 'Teuerster Tarif',
+    'Wing 1 / 2': 'Flügel 1 / 2',
+    'Wing 3 / 4': 'Flügel 3 / 4',
+    'Wing 5': 'Flügel 5',
+    'Wing 6 / 7': 'Flügel 6 / 7',
+    'Wing 8 / 9': 'Flügel 8 / 9',
+  };
+</script>
+<script src="{{ '/heating-costs/resources/vue.min.js' | relative_url }}"></script>
+<script src="{{ '/heating-costs/resources/mathHelper.js' | relative_url }}"></script>
+<script src="{{ '/heating-costs/resources/tariffs.js' | relative_url }}"></script>
+<script src="{{ '/heating-costs/resources/calculator.js' | relative_url }}"></script>

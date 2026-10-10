@@ -1,0 +1,16 @@
+{%- comment -%}
+  Works out the page's language. Sets `lang` ("en" or "de"), `t` (its words from _data/i18n.yml),
+  `lp` (the address prefix of its pages: "" or "/de"), `path` (the page's address without that prefix)
+  and `other_url` (the same page in the other language). German pages live under de/.
+{%- endcomment -%}
+{%- assign lang = page.lang | default: site.lang -%}
+{%- assign t = site.data.i18n[lang] | default: site.data.i18n.en -%}
+{%- if lang == 'de' -%}
+  {%- assign lp = '/de' -%}
+  {%- assign path = page.url | remove_first: '/de' -%}
+  {%- assign other_url = path -%}
+{%- else -%}
+  {%- assign lp = '' -%}
+  {%- assign path = page.url -%}
+  {%- assign other_url = '/de' | append: page.url -%}
+{%- endif -%}

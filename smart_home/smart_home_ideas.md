@@ -45,7 +45,7 @@ The main goal of this page is to give you ideas about how to have a Smart Home s
 
 #### Example photo
 
-<img src="./resources/camera.jpg"  width="25%">
+<img loading="lazy" decoding="async" src="./resources/camera.webp"  width="25%">
 
 #### Cost estimation
 
@@ -83,8 +83,8 @@ Item list:
 
 #### Example photos
 
-<img src="./resources/door.jpg" width="25%">
-<img src="./resources/camera.jpg"  width="25%">
+<img loading="lazy" decoding="async" src="./resources/door.webp" width="25%">
+<img loading="lazy" decoding="async" src="./resources/camera.webp"  width="25%">
 
 ## kit 3 - Custom Smart Home Kit
 
@@ -103,8 +103,8 @@ For details, contact me on WhatsApp or use the common group chat.
 
 #### Example photos
 
-<img src="./resources/home_assistant_1.jpg"  width="25%">
-<img src="./resources/home_assistant_2.jpg"  width="25%">
+<img loading="lazy" decoding="async" src="./resources/home_assistant_1.webp"  width="25%">
+<img loading="lazy" decoding="async" src="./resources/home_assistant_2.webp"  width="25%">
 
 #### Cost estimation
 Costs are hard to estimate here, but it starts around 200 EUR and depending on how many smart items you want it can go higher.

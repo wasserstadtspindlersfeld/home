@@ -1,0 +1,9 @@
+{%- comment -%} Light or dark. "System" follows the phone or computer. Used in the header and the menu; id keeps the radio groups apart. {%- endcomment -%}
+<fieldset class="appearance" data-appearance>
+  <legend class="appearance-label">{{ t.appearance }}</legend>
+  <div class="appearance-options">
+    <label class="appearance-option"><input type="radio" name="theme-{{ include.id }}" value="system" checked><span>{% include icon.html name="system" weight=2 %}{{ t.system }}</span></label>
+    <label class="appearance-option"><input type="radio" name="theme-{{ include.id }}" value="light"><span>{% include icon.html name="sun" weight=2 %}{{ t.light }}</span></label>
+    <label class="appearance-option"><input type="radio" name="theme-{{ include.id }}" value="dark"><span>{% include icon.html name="moon" weight=2 %}{{ t.dark }}</span></label>
+  </div>
+</fieldset>

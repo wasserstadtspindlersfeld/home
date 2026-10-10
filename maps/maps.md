@@ -8,7 +8,7 @@ This map is a [Google Earth Project](https://earth.google.com/earth/d/1wL9vX30Bz
 
 > Note: the current version of the map has some flaws with the top level apartments, fix is in progress.
 
-<img src="./resources/entrances.png" alt="entrances" width="100%"/>
+<img loading="lazy" decoding="async" src="./resources/entrances.webp" alt="entrances" width="100%"/>
 
 ### Some maps are prepared to be printed, please mark the actual location with a circle after printing it.
 

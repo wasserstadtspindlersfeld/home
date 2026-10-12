@@ -50,14 +50,14 @@ export const PAVILION_TOP = 19.9; // pavilions keep brick up to here, then a par
 export const LINK_TOP = 16.1;
 
 // Street entrances as marked on the printable map, snapped onto the facade they sit on.
-// ids match _data/building.yml, which holds the addresses.
+// ids match _data/building.yml, which holds the addresses and which flats go in by each one.
 export const ENTRANCES = [
-  { id: 'cs13', at: [477, 329], face: 'n', wings: [4] },
-  { id: 'cs15', at: [316, 331.5], face: 'n', wings: [3] },
-  { id: 'ah1', at: [126, 354], face: 'w', wings: [1] },
-  { id: 'ah3', at: [135, 496], face: 'w', wings: [] },
-  { id: 'ah5', at: [125, 639], face: 'w', wings: [9] },
-  { id: 'hl14', at: [313, 658], face: 's', wings: [7, 8] },
+  { id: 'cs13', at: [477, 329], face: 'n' },
+  { id: 'cs15', at: [316, 331.5], face: 'n' },
+  { id: 'ah1', at: [126, 354], face: 'w' },
+  { id: 'ah3', at: [135, 496], face: 'w' },
+  { id: 'ah5', at: [125, 639], face: 'w' },
+  { id: 'hl14', at: [313, 658], face: 's' },
 ];
 
 // Surroundings, in map units.

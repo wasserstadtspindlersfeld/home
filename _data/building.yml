@@ -23,12 +23,14 @@ wings:
   - { n: 8, color: "#D2378F", ink: "#ffffff", dye: "Fuchsine", where: "South side, west half, along Henriette-Lustig-Straße", de: { dye: "Fuchsin", where: "Südseite, westliche Hälfte, an der Henriette-Lustig-Straße" } }
   - { n: 9, color: "#26457D", ink: "#ffffff", dye: "Prussian blue", where: "Southwest corner, along Adolf-Heyden-Straße", de: { dye: "Berliner Blau", where: "Südwestecke, an der Adolf-Heyden-Straße" } }
 
-# Street entrances marked on the printable map. wings = the wings whose facade the entrance is on.
+# Street entrances marked on the printable map. wings = the wings whose flats go in by it.
+# doors = single flats that go in by it instead of by their wing's entrance, on every floor
+# ({ wing: 9, door: 11 } is 9.0.11, 9.1.11, 9.2.11 ...). note = shown after the address on the 3D map.
 entrances:
   - { id: cs13, label: "Carl-Spindler-Str. 13", wings: [4] }
   - { id: cs15, label: "Carl-Spindler-Str. 15", wings: [3] }
   - { id: ah1, label: "Adolf-Heyden-Str. 1", wings: [1] }
-  - { id: ah3, label: "Adolf-Heyden-Str. 3 (garage)", wings: [], de: { label: "Adolf-Heyden-Str. 3 (Tiefgarage)" } }
+  - { id: ah3, label: "Adolf-Heyden-Str. 3", note: "garage", wings: [], doors: [{ wing: 9, door: 11 }], de: { note: "Tiefgarage" } }
   - { id: ah5, label: "Adolf-Heyden-Str. 5", wings: [9] }
   - { id: hl14, label: "Henriette-Lustig-Str. 14", wings: [7, 8] }
 

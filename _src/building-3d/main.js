@@ -24,6 +24,7 @@ const LANG = document.documentElement.lang === 'de' ? 'de' : 'en';
 const TEXT = {
   en: {
     wing: 'Wing', floor: 'Floor', door: 'Door', doorInline: 'door', entrance: 'Street entrance',
+    forDoors: (doors) => `for door${doors.length > 1 ? 's' : ''} ${doors.join(', ')}`,
     pickFloor: 'Pick a floor below the model to see where it is.',
     share: 'Share this location', copy: 'Copy link', copied: 'Link copied', clear: 'Clear', colour: 'Wing colour',
     laundry: 'Laundry room', laundryPlate: 'Laundry', at: (where) => `At ${where}`, laundryAt: (where) => `Laundry room at ${where}`,
@@ -31,6 +32,7 @@ const TEXT = {
   },
   de: {
     wing: 'Flügel', floor: 'Etage', door: 'Tür', doorInline: 'Tür', entrance: 'Hauseingang',
+    forDoors: (doors) => `für ${doors.length > 1 ? 'Türen' : 'Tür'} ${doors.join(', ')}`,
     pickFloor: 'Wähle unten eine Etage, dann siehst du, wo sie liegt.',
     share: 'Ort teilen', copy: 'Link kopieren', copied: 'Link kopiert', clear: 'Zurücksetzen', colour: 'Flügelfarbe',
     laundry: 'Waschraum', laundryPlate: 'Waschraum', at: (where) => `Am Eingang ${where}`, laundryAt: (where) => `Waschraum am Eingang ${where}`,
@@ -45,6 +47,20 @@ const easeIn = (el) => {
 // a data entry's text in the page's language, from its de: block where there is one
 const local = (item, key) => (LANG === 'de' && item.de && item.de[key]) || item[key];
 const floorName = (f) => (LANG === 'de' ? f.de_long || f.de : f.en);
+// The street entrances a pick goes in by, as [{ e, doors }]. A wing's flats use its entrances, except
+// the doors an entrance lists as its own (building.yml). A picked door gets only the one it uses; a
+// wing or floor on its own gets all of them, the exceptions with their door numbers.
+function entrancesFor(entrances, sel) {
+  if (sel.wing == null || sel.laundry) return [];
+  const doorsOf = (e) => (e.doors || []).filter((d) => d.wing === sel.wing).map((d) => d.door);
+  if (sel.door != null) {
+    const own = entrances.filter((e) => doorsOf(e).includes(sel.door));
+    if (own.length) return own.map((e) => ({ e }));
+  }
+  const usual = entrances.filter((e) => (e.wings || []).includes(sel.wing)).map((e) => ({ e }));
+  if (sel.door != null) return usual;
+  return usual.concat(entrances.filter((e) => doorsOf(e).length).map((e) => ({ e, doors: doorsOf(e) })));
+}
 
 const root = document.getElementById('building-3d');
 if (root) start(root);
@@ -173,7 +189,7 @@ function createUI(root, data) {
     if (sel.laundry) { renderLaundry(laundry.get(sel.laundry)); return; }
     if (sel.wing == null) { card.innerHTML = emptyCard; card.dataset.state = 'empty'; return; }
     const w = wings.get(sel.wing);
-    const ents = data.entrances.filter((e) => (e.wings || []).includes(sel.wing));
+    const ents = entrancesFor(data.entrances, sel);
     const floor = sel.floor != null ? data.floors[sel.floor] : null;
     card.dataset.state = 'wing';
     card.style.setProperty('--swatch', w.color);
@@ -184,7 +200,7 @@ function createUI(root, data) {
     const reading = [`${TEXT.wing} ${w.n}`, floor ? floorName(floor) : null, sel.door != null ? `${TEXT.doorInline} ${sel.door}` : null].filter(Boolean).join(', ');
     const facts = [
       floor ? [TEXT.floor, `${floorName(floor)} · ${floor.de}`] : null,
-      ...ents.map((e) => [TEXT.entrance, local(e, 'label')]),
+      ...ents.map(({ e, doors }) => [TEXT.entrance, doors ? `${local(e, 'label')}, ${TEXT.forDoors(doors)}` : local(e, 'label')]),
     ].filter(Boolean);
     card.innerHTML = `
       <div class="sign" aria-hidden="true">${sign}</div>
@@ -263,7 +279,12 @@ function createUI(root, data) {
       const res = m ? { wing: Number(m[1]), floor: null, door: null } : parseDoor(h, data.floors.length - 1);
       if (!res.error && res.wing) select(res, 'hash');
     },
-    entranceLabel: (id) => (entrances.has(id) ? local(entrances.get(id), 'label') : ''),
+    entranceLabel: (id) => {
+      const e = entrances.get(id);
+      if (!e) return '';
+      const note = local(e, 'note');
+      return note ? `${local(e, 'label')} (${note})` : local(e, 'label');
+    },
     wing: (n) => wings.get(n),
   };
 }
@@ -532,7 +553,7 @@ function createViewer(root, data, ui, reduceMotion) {
 
   // --- selection state, animated per part (wing × storey) through the uPart uniform array
   const LIFT = 8;
-  let selection = { wing: null, floor: null, laundry: null };
+  let selection = { wing: null, floor: null, door: null, laundry: null };
   let anim = null;
   const state = Array.from({ length: PARTS }, () => ({ lift: 0, fade: 0, tint: 0, dim: 0, pastel: false }));
   function targetFor(i) {
@@ -776,10 +797,10 @@ function createViewer(root, data, ui, reduceMotion) {
       b.el.classList.toggle('is-active', selection.wing === n);
       b.el.classList.toggle('is-muted', selection.wing != null && selection.wing !== n);
     });
+    const used = new Set(entrancesFor(data.entrances, selection).map(({ e }) => e.id));
     const at = pins.map((p) => {
-      // an entrance shows its address when its wing is picked, or its laundry room
-      const on = p.laundry ? selection.laundry === p.laundry
-        : (selection.wing != null && p.data.wings.includes(selection.wing)) || selection.laundry === p.data.id;
+      // an entrance shows its address when the picked wing or door goes in by it, or its laundry room is picked
+      const on = p.laundry ? selection.laundry === p.laundry : used.has(p.data.id) || selection.laundry === p.data.id;
       p.el.classList.toggle('is-active', on);
       if (p.laundry && p.on !== on) { p.on = on; p.el.setAttribute('aria-pressed', String(on)); }
       const a = place(p.el, p.pos, true);
@@ -899,7 +920,7 @@ function createViewer(root, data, ui, reduceMotion) {
 
   return {
     select(sel, source) {
-      selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null, laundry: sel.laundry || null };
+      selection = { wing: sel.wing, floor: sel.wing != null ? sel.floor : null, door: sel.wing != null ? sel.door ?? null : null, laundry: sel.laundry || null };
       overlayBoxes = null; // the floor stepper and the card may have changed size
       applySelection();
       const picked = selection.wing != null || selection.laundry != null;
